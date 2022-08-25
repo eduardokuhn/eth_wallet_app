@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../../../layout/compose-model-1661352409387.xml" value="0.24537037037037038" />
+        <entry key="../../../../../../layout/compose-model-1661370189302.xml" value="1.0469314079422383" />
+        <entry key="../../../../../../layout/compose-model-1661374430344.xml" value="0.33" />
+        <entry key="app/src/main/res/drawable/ic_wallet_illustration.xml" value="0.152" />
+        <entry key="app/src/main/res/drawable/wallet_icon.xml" value="0.131" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
