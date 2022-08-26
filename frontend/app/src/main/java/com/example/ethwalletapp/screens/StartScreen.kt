@@ -1,5 +1,6 @@
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -24,54 +26,47 @@ import com.example.ethwalletapp.ui.theme.Gray24
 fun StartScreen() {
   Scaffold(
     backgroundColor = Gray24
-  ) {
-    Column {
+  ) { padding ->
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Bottom,
+      modifier = Modifier
+        .padding(padding)
+        .fillMaxSize()
+    ) {
       Text(
         text = "Wallet Setup",
-        fontSize = 56.sp,
+        fontSize = 40.sp,
         color = Color.White,
       )
+      Spacer(modifier = Modifier.height(36.dp))
       Button(
         onClick = { /*TODO*/ },
         colors = ButtonDefaults.buttonColors(backgroundColor = Gray21),
         shape = RoundedCornerShape(50.dp),
         modifier = Modifier
-          .height(85.dp)
+          .height(56.dp)
+          .padding(horizontal = 24.dp)
           .fillMaxWidth()
-          .padding(horizontal = 24.dp, vertical = 16.dp)
       ) {
         Text(
           text = "Import Using Recovery Phrase",
-          fontSize = 24.sp,
+          fontSize = 16.sp,
           color = Color.White,
         )
       }
-      Button(
+      Spacer(modifier = Modifier.height(16.dp))
+      GradientButton(
         onClick = { /*TODO*/ },
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-        shape = RoundedCornerShape(50.dp),
-        modifier = Modifier
-          .height(85.dp)
-          .fillMaxWidth()
-          .padding(horizontal = 24.dp, vertical = 16.dp)
-      ) {
-        Box(
-          modifier = Modifier.background(Brush.horizontalGradient(colors = Gradient06))
-        ) {
-          Text(
-            text = "Create a New Wallet",
-            color = Color.White,
-            modifier = Modifier
-              .height(24.dp)
-          )
-        }
-      }
+        text = "Create a New Wallet"
+      )
+      Spacer(modifier = Modifier.height(66.dp))
     }
   }
 }
 
 @Preview
 @Composable
-fun PreviewStartScreen() {
+fun StartScreenPreview() {
   StartScreen()
 }
