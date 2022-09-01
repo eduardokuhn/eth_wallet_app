@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.ui.theme
+package com.example.ethwalletapp.shared.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

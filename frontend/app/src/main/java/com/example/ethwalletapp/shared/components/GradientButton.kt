@@ -9,9 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ethwalletapp.ui.theme.Gradient06
+import com.example.ethwalletapp.shared.theme.Gradient06
 
 @Composable
 fun GradientButton(
@@ -41,4 +42,10 @@ fun GradientButton(
       )
     }
   }
+}
+
+@Preview
+@Composable
+fun GradientButtonPreview() {
+  GradientButton(onClick = { /*TODO*/ }, text = "Enter")
 }

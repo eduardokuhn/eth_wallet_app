@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.ui.theme
+package com.example.ethwalletapp.shared.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
