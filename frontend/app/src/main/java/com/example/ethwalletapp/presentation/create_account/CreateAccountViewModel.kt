@@ -3,6 +3,7 @@ package com.example.ethwalletapp.ui.create_account
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.ethwalletapp.data.repositories.EthWalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -59,7 +60,7 @@ data class UIState(
 
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
-
+  private val ethWalletRepository: EthWalletRepository
 ) : ViewModel() {
   private var _uiState = mutableStateOf(UIState())
   val uiState: State<UIState> = _uiState
@@ -67,9 +68,10 @@ class CreateAccountViewModel @Inject constructor(
   fun onEvent(event: UIEvent) {
     when(event) {
       is UIEvent.CreateWallet -> {
-
+        val keyPair = ethWalletRepository.createDefaultAccount("eduardo")
+        ethWalletRepository.addressFromPublicKey(keyPair.public)
       }
-      else -> {}
+      else -> { println("Undefined UIEvent") }
     }
   }
 

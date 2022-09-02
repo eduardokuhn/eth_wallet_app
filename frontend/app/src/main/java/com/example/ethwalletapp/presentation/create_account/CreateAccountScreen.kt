@@ -26,13 +26,14 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.*
+import com.example.ethwalletapp.ui.create_account.UIEvent
 
 @Composable
 fun CreateAccountScreen(
   navController: NavController?,
-  viewModel: CreateAccountViewModel = CreateAccountViewModel()
+  viewModel: CreateAccountViewModel?
 ) {
-  val uiState = viewModel.uiState
+  val uiState = viewModel?.uiState!!
 
   Scaffold(
     backgroundColor = Gray24
@@ -157,7 +158,7 @@ fun CreateAccountScreen(
       }
       Spacer(modifier = Modifier.weight(1f))
       GradientButton(
-        onClick = { /*TODO*/ },
+        onClick = { viewModel.onEvent(UIEvent.CreateWallet) },
         text = "Create Wallet"
       )
       Spacer(modifier = Modifier.height(42.dp))
@@ -168,7 +169,7 @@ fun CreateAccountScreen(
 @Preview
 @Composable
 fun CreateAccountScreenPreview() {
-  CreateAccountScreen(null)
+  CreateAccountScreen(null, null)
 }
 
 @Composable
