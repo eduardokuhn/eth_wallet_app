@@ -51,11 +51,17 @@ android {
 }
 
 dependencies {
+    implementation "com.github.komputing:kbip44:0.5"
     implementation "com.github.komputing:khex:1.1.2"
     implementation "com.github.komputing.khash:keccak:1.1.1"
     implementation "com.github.komputing.khash:sha256:1.1.1"
 
-    implementation "cash.z.ecc.android:kotlin-bip39:1.0.4"
+    implementation "com.github.komputing.kethereum:model:$kethereum_version"
+    implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
+    implementation "com.github.komputing.kethereum:crypto_impl_bouncycastle:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip32:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
 
     implementation 'com.google.dagger:hilt-android:2.43.2'
     kapt 'com.google.dagger:hilt-compiler:2.43.2'

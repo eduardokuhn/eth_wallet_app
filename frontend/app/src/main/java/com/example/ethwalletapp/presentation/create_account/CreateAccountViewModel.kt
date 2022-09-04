@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.ethwalletapp.data.repositories.EthWalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.kethereum.crypto.toAddress
 import javax.inject.Inject
 
 sealed class CreateAccountStep {
@@ -68,8 +69,7 @@ class CreateAccountViewModel @Inject constructor(
   fun onEvent(event: UIEvent) {
     when(event) {
       is UIEvent.CreateWallet -> {
-        val keyPair = ethWalletRepository.createDefaultAccount("eduardo")
-        ethWalletRepository.addressFromPublicKey(keyPair.public)
+
       }
       else -> { println("Undefined UIEvent") }
     }

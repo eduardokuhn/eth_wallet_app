@@ -1,6 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.2.1'
+        kethereum_version = '0.85.7'
     }
     dependencies {
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.43.2'

@@ -1,22 +1,22 @@
 package com.example.ethwalletapp.data.repositories
 
-import cash.z.ecc.android.bip39.Mnemonics
-import cash.z.ecc.android.bip39.toSeed
-import org.komputing.khash.keccak.Keccak
-import org.komputing.khash.keccak.KeccakParameter
-import org.komputing.khash.sha256.Sha256
-import org.komputing.khex.extensions.toHexString
-import java.math.BigInteger
-import java.security.*
-import java.security.spec.ECParameterSpec
-import java.security.spec.ECPrivateKeySpec
-import java.security.spec.KeySpec
-import java.security.spec.PKCS8EncodedKeySpec
+import org.kethereum.DEFAULT_ETHEREUM_BIP44_PATH
+import org.kethereum.bip32.generateChildKey
+import org.kethereum.bip32.model.ExtendedKey
+import org.komputing.kbip44.BIP44
+import org.kethereum.bip39.*
+import org.kethereum.bip39.model.MnemonicWords
+import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
+import org.kethereum.crypto.toAddress
+import org.kethereum.model.Address
+import org.kethereum.model.ECKeyPair
+import org.kethereum.model.PrivateKey
+import org.kethereum.model.PublicKey
 import javax.inject.Inject
 
 /*
 1. Generate mnemonic (secret recovery phrase) with the BIP39
-2. Generate seed from existing mnemonic
+2. Generate seed from existing mnemonic (The seed is used to get a master key for a hierarchical deterministic wallet (or HD wallet)
 3. Generate a private key from the seed
 4. Get the public key derived from private key using ECDSA algorithm
 5. From the public key derived, compute a keccak256 hash
@@ -24,43 +24,58 @@ import javax.inject.Inject
  */
 
 class EthWalletRepository @Inject constructor() {
-  fun createDefaultAccount(password: String): KeyPair {
+  private val saltPhrase: String = "Eduardo is lovely"
+
+  fun createMasterAccount(): ECKeyPair {
     // Create a new 12-word mnemonic phrase (secret recovery phrase)
-    val mnemonicCode: Mnemonics.MnemonicCode = Mnemonics.MnemonicCode(Mnemonics.WordCount.COUNT_12)
-    // Generate seed with password
-    val seed: ByteArray = mnemonicCode.toSeed(password.toCharArray())
-    // Delete the mnemonic from memory
-    mnemonicCode.clear()
+    val mnemonicPhrase: String = generateMnemonic(128, WORDLIST_ENGLISH)
+    println("Mnemonic: $mnemonicPhrase")
+    val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(mnemonicPhrase)
+    // Generate the master key (512bit long key) from seed of the mnemonic phrase
+    // Master key path: (m/44'/60'/0'/0/0)
+    val masterKey: ExtendedKey = mnemonicWords.toKey(DEFAULT_ETHEREUM_BIP44_PATH, saltPhrase)
 
-    val keyGenerator: KeyPairGenerator = KeyPairGenerator.getInstance("EC")
-    // Randomness of the private key
-    val random: SecureRandom = SecureRandom.getInstance("SHA1PRNG")
-    random.setSeed(seed)
-    keyGenerator.initialize(256, random)
-
-    return keyGenerator.generateKeyPair()
+    // Key pair from the master key (master account)
+    return masterKey.keyPair
   }
 
-  fun createAdditionalAccount(previousPrivateKey: PrivateKey): KeyPair {
-    // Hash the previous private key to get a new raw private key related to the previous one
-    val encodedPrivateKey: ByteArray = Sha256.digest(previousPrivateKey.encoded)
+  fun createChildAccount(secretRecoveryPhrase: String, addressIndex: Int): ECKeyPair {
+    // From the mnemonic phrase the master key can be created
+    val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
+    var path: String = DEFAULT_ETHEREUM_BIP44_PATH
+    // Increase the address_index (m/44'/60'/0'/0/address_index)
+    path = path.substring(0, 15) + addressIndex.toString()
+    // Generate the child key from the mnemonic phrase and updated path
+    val childKey: ExtendedKey = mnemonicWords.toKey(path, saltPhrase)
 
-    val keyFactory = KeyFactory.getInstance("EC")
-
-    // Generate the public key from raw private key
-    val publicKey: PublicKey = keyFactory.generatePublic(PKCS8EncodedKeySpec(encodedPrivateKey))
-    // Generate the private key from raw
-    val privateKey: PrivateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(encodedPrivateKey))
-
-    return KeyPair(publicKey, privateKey)
+    // Key pair from the child key
+    return childKey.keyPair
   }
 
-  fun addressFromPublicKey(publicKey: PublicKey): String {
-    // Compute a keccak256 hash from the public key
-    val keccak256: ByteArray = Keccak.digest(publicKey.encoded, KeccakParameter.KECCAK_256)
-    // Take the last 20 bytes from the keccak256 hash
-    val address: ByteArray = keccak256.copyOfRange(fromIndex = 12, toIndex = 32)
-    // Convert the last 20 bytes to hexadecimal and prefix it with "0x"
-    return address.toHexString()
+  // Getting address from public key
+  // 1. Compute a keccak256 hash from the public key
+  // 2. Take the last 20 bytes from the keccak256 hash
+  // 3. Convert the last 20 bytes to hexadecimal and prefix it with "0x"
+
+  fun importMasterAccount(secretRecoveryPhrase: String): ECKeyPair {
+    val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
+    val masterKey: ExtendedKey = mnemonicWords.toKey(DEFAULT_ETHEREUM_BIP44_PATH, saltPhrase)
+
+    return masterKey.keyPair
+  }
+
+  fun importChildAccount(secretRecoveryPhrase: String): List<ECKeyPair> {
+    var childAccounts: List<ECKeyPair> = mutableListOf()
+
+    repeat(9) { addressIndex ->
+      val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
+      var path: String = DEFAULT_ETHEREUM_BIP44_PATH
+      path = path.substring(0, 15) + addressIndex.toString()
+      val childKey: ExtendedKey = mnemonicWords.toKey(path, saltPhrase)
+
+      childAccounts.plus(childKey)
+    }
+
+    return childAccounts
   }
 }
