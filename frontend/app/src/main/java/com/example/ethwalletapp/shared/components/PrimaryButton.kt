@@ -13,15 +13,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.shared.theme.Gradient06
+import com.example.ethwalletapp.shared.theme.Gray18
+import com.example.ethwalletapp.shared.theme.Gray23
 
 @Composable
-fun GradientButton(
+fun PrimaryButton(
   onClick: () -> Unit,
   text: String,
+  disabled: Boolean = false
 ) {
   Button(
-    onClick = onClick,
-    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+    onClick = { if (!disabled) onClick() },
+    colors = ButtonDefaults.buttonColors(backgroundColor = if (!disabled) Color.Transparent else Gray23),
     shape = RoundedCornerShape(50.dp),
     contentPadding = PaddingValues(0.dp),
     modifier = Modifier
@@ -29,23 +32,30 @@ fun GradientButton(
       .padding(horizontal = 24.dp)
       .fillMaxWidth()
   ) {
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier
-        .background(Brush.horizontalGradient(colors = Gradient06))
-        .fillMaxSize()
-    ) {
+    if (!disabled)
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .background(Brush.horizontalGradient(colors = Gradient06))
+          .fillMaxSize()
+      ) {
+        Text(
+          text = text,
+          fontSize = 16.sp,
+          color = Color.White,
+        )
+      }
+    else
       Text(
         text = text,
         fontSize = 16.sp,
-        color = Color.White,
+        color = Gray18,
       )
-    }
   }
 }
 
 @Preview
 @Composable
-fun GradientButtonPreview() {
-  GradientButton(onClick = { /*TODO*/ }, text = "Enter")
+fun PrimaryButtonPreview() {
+  PrimaryButton(onClick = {}, text = "Enter")
 }

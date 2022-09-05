@@ -51,7 +51,7 @@ fun StartScreen(navController: NavController?) {
         )
       }
       Spacer(modifier = Modifier.height(16.dp))
-      GradientButton(
+      PrimaryButton(
         onClick = { navController?.navigate(Screen.CreateAccountScreen.route) },
         text = "Create a New Wallet"
       )

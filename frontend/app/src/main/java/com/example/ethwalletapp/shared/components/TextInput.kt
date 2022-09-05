@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.*
@@ -20,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Gray22
+import com.example.ethwalletapp.shared.theme.Red6
 
 @Composable
 fun TextInput(
@@ -30,6 +29,7 @@ fun TextInput(
   label: String,
   trailingIcon: @Composable () -> Unit,
   helperText: String? = null,
+  hasError: Boolean = false,
 ) {
 
 
@@ -40,6 +40,7 @@ fun TextInput(
       singleLine = true,
       keyboardOptions = keyboardOptions,
       visualTransformation =  visualTransformation,
+      textStyle = LocalTextStyle.current.copy(color = Color.White),
       decorationBox = { innerTextField ->
         Row(
           verticalAlignment = Alignment.CenterVertically,
@@ -69,7 +70,7 @@ fun TextInput(
         .fillMaxWidth()
         .border(
           width = 1.dp,
-          color = Gray22,
+          color = if (!hasError) Gray22 else Red6,
           shape = RoundedCornerShape(16.dp)
         )
         .background(
@@ -86,7 +87,7 @@ fun TextInput(
         Text(
           text = helperText,
           fontSize = 12.sp,
-          color = Gray12
+          color = if (!hasError) Gray12 else Red6
         )
       }
     }

@@ -1,16 +1,16 @@
 package com.example.ethwalletapp.shared.navigation
 
-import CreateAccountScreen
+import com.example.ethwalletapp.presentation.create_wallet.CreateWalletScreen
 import StartScreen
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.ethwalletapp.ui.create_account.CreateAccountViewModel
+import com.example.ethwalletapp.presentation.create_wallet.CreateWalletViewModel
 
 @Composable
-fun Navigation() {
+fun Navigator() {
   val navController = rememberNavController()
 
   NavHost(
@@ -19,8 +19,8 @@ fun Navigation() {
   ) {
     composable(route = Screen.StartScreen.route) { StartScreen(navController) }
     composable(route = Screen.CreateAccountScreen.route) {
-      val viewModel: CreateAccountViewModel = hiltViewModel()
-      CreateAccountScreen(navController, viewModel)
+      val viewModel: CreateWalletViewModel = hiltViewModel()
+      CreateWalletScreen(navController, viewModel)
     }
   }
 }

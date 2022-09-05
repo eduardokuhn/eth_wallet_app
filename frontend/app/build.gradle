@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation "com.google.accompanist:accompanist-pager:0.25.1"
+
     implementation "com.github.komputing:kbip44:0.5"
     implementation "com.github.komputing:khex:1.1.2"
     implementation "com.github.komputing.khash:keccak:1.1.1"
