@@ -11,10 +11,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.ethwalletapp.presentation.create_wallet.components.ConfirmSecretRecoveryPhraseStep
-import com.example.ethwalletapp.presentation.create_wallet.components.CreateWalletStep
-import com.example.ethwalletapp.presentation.create_wallet.components.SecureWalletStep
-import com.example.ethwalletapp.presentation.create_wallet.components.StepProgressBar
+import com.example.ethwalletapp.presentation.create_wallet.components.*
 import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -28,7 +25,7 @@ fun CreateWalletScreen(
   navController: NavController?,
   viewModel: ICreateAccountViewModel,
 ) {
-  val uiState = viewModel.uiState
+  val uiState = viewModel.uiState.value
 
   val pagerState = rememberPagerState()
   val scope = rememberCoroutineScope()
@@ -41,28 +38,28 @@ fun CreateWalletScreen(
       modifier = Modifier
         .padding(padding)
         .fillMaxSize()
+        .padding(horizontal = 24.dp)
     ) {
       Spacer(modifier = Modifier.height(44.dp))
-      Row(
-        verticalAlignment = Alignment.CenterVertically
-      ) {
+      Box(Modifier.fillMaxWidth()) {
         IconButton(
           onClick = {
             println(pagerState.currentPage)
             when (pagerState.currentPage) {
               0 -> navController?.navigate(Screen.StartScreen.route)
               1 -> {
-                val step = CreateAccountStep.CreateWallet
+                val step = CreateWalletStep.CreatePassword
                 viewModel.setCurrentStep(step)
                 scope.launch { pagerState.animateScrollToPage(step.index()) }
               }
               else -> {
-                val step = CreateAccountStep.SecureWallet
+                val step = CreateWalletStep.SecureWallet
                 viewModel.setCurrentStep(step)
                 scope.launch { pagerState.animateScrollToPage(step.index()) }
               }
             }
           },
+          modifier = Modifier.align(Alignment.CenterStart)
         ) {
           Icon(
             Icons.Filled.ArrowBack,
@@ -71,8 +68,8 @@ fun CreateWalletScreen(
           )
         }
         StepProgressBar(
-          currentStep = uiState.value.currentStep,
-          modifier = Modifier.fillMaxWidth()
+          currentStep = uiState.currentStep,
+          modifier = Modifier.align(Alignment.Center)
         )
       }
       HorizontalPager(
@@ -83,24 +80,36 @@ fun CreateWalletScreen(
           .fillMaxSize()
       ) { index ->
         when (index) {
-          0 -> CreateWalletStep(
+          0 -> CreatePasswordStep(
             createWallet = {
-              val success = viewModel.createWallet()
+              val success = viewModel.createPassword()
               if (success) {
-                val step = CreateAccountStep.SecureWallet
+                val step = CreateWalletStep.SecureWallet
                 viewModel.setCurrentStep(step)
                 scope.launch { pagerState.animateScrollToPage(step.index()) }
               }
             },
-            uiState = viewModel.uiState.value,
+            uiState = uiState,
             setPassword = viewModel::setPassword,
             toggleShowPassword = viewModel::toggleShowPassword,
             setPasswordConfirmation = viewModel::setPasswordConfirmation,
             toggleShowPasswordConfirmation = viewModel::toggleShowPasswordConfirmation,
             toggleIsChecked = viewModel::toggleIsChecked
           )
-          1 -> SecureWalletStep()
-          2 -> ConfirmSecretRecoveryPhraseStep()
+          1 -> SecureWalletStep(
+            next = {
+              val step = CreateWalletStep.ConfirmSecretRecoveryPhrase
+              viewModel.setCurrentStep(step)
+              scope.launch { pagerState.animateScrollToPage(step.index()) }
+             },
+            uiState = uiState,
+            toggleShowSecretRecoveryPhrase = viewModel::toggleShowSecretRecoveryPhrase
+          )
+          2 -> ConfirmSecretRecoveryPhraseStep(
+            next = {},
+            uiState = uiState,
+            setSecretRecoveryPhraseConfirmation = viewModel::setSecretRecoveryPhraseConfirmation
+          )
         }
       }
     }

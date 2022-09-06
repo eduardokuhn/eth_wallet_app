@@ -6,21 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shader
-import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.ethwalletapp.presentation.create_wallet.CreateAccountStep
+import com.example.ethwalletapp.presentation.create_wallet.CreateWalletStep
 import com.example.ethwalletapp.shared.theme.Gray21
 import com.example.ethwalletapp.shared.theme.Primary5
 
 @Composable
 fun StepProgressBar(
-  currentStep: CreateAccountStep,
+  currentStep: CreateWalletStep,
   modifier: Modifier = Modifier,
 ) {
   Box(
@@ -70,23 +65,23 @@ fun StepProgressBar(
 @Preview
 @Composable
 private fun CreateWalletStepProgressBarPreview() {
-  StepProgressBar(currentStep = CreateAccountStep.CreateWallet)
+  StepProgressBar(currentStep = CreateWalletStep.CreatePassword)
 }
 
 @Preview
 @Composable
 private fun SecureWalletStepProgressBarPreview() {
-  StepProgressBar(currentStep = CreateAccountStep.SecureWallet)
+  StepProgressBar(currentStep = CreateWalletStep.SecureWallet)
 }
 
 @Preview
 @Composable
 private fun ConfirmStepProgressBarPreview3() {
-  StepProgressBar(currentStep = CreateAccountStep.ConfirmSecretRecoveryPhrase)
+  StepProgressBar(currentStep = CreateWalletStep.ConfirmSecretRecoveryPhrase)
 }
 
 @Composable
-fun StepDot(index: Int, currentStep: CreateAccountStep) {
+fun StepDot(index: Int, currentStep: CreateWalletStep) {
   Canvas(
     modifier = Modifier
       .size(8.dp),

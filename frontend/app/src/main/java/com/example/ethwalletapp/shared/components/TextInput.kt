@@ -24,20 +24,19 @@ import com.example.ethwalletapp.shared.theme.Red6
 fun TextInput(
   value: String,
   onValueChange: (String) -> Unit,
+  singleLine: Boolean = true,
   keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
   visualTransformation: VisualTransformation = VisualTransformation.None,
   label: String,
-  trailingIcon: @Composable () -> Unit,
+  trailingIcon: @Composable (() -> Unit)? = null,
   helperText: String? = null,
   hasError: Boolean = false,
 ) {
-
-
   Column {
     BasicTextField(
       value = value,
       onValueChange = onValueChange,
-      singleLine = true,
+      singleLine = singleLine,
       keyboardOptions = keyboardOptions,
       visualTransformation =  visualTransformation,
       textStyle = LocalTextStyle.current.copy(color = Color.White),
@@ -60,9 +59,7 @@ fun TextInput(
             )
             innerTextField()
           }
-          Column {
-            trailingIcon.invoke()
-          }
+          trailingIcon?.invoke()
         }
       },
       modifier = Modifier

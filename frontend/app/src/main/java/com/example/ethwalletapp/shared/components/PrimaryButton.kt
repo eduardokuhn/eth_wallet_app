@@ -20,23 +20,23 @@ import com.example.ethwalletapp.shared.theme.Gray23
 fun PrimaryButton(
   onClick: () -> Unit,
   text: String,
-  disabled: Boolean = false
+  disabled: Boolean = false,
+  modifier: Modifier = Modifier
 ) {
   Button(
     onClick = { if (!disabled) onClick() },
     colors = ButtonDefaults.buttonColors(backgroundColor = if (!disabled) Color.Transparent else Gray23),
     shape = RoundedCornerShape(50.dp),
     contentPadding = PaddingValues(0.dp),
-    modifier = Modifier
+    modifier = modifier
       .height(56.dp)
-      .padding(horizontal = 24.dp)
-      .fillMaxWidth()
   ) {
     if (!disabled)
       Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
           .background(Brush.horizontalGradient(colors = Gradient06))
+          .padding(horizontal = 16.dp)
           .fillMaxSize()
       ) {
         Text(
@@ -50,6 +50,7 @@ fun PrimaryButton(
         text = text,
         fontSize = 16.sp,
         color = Gray18,
+        modifier = Modifier.padding(horizontal = 16.dp)
       )
   }
 }

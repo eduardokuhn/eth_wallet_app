@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ethwalletapp.presentation.create_wallet.CreateAccountStep
+import com.example.ethwalletapp.presentation.create_wallet.CreateWalletStep
 import com.example.ethwalletapp.shared.theme.Gradient07
 import com.example.ethwalletapp.shared.theme.Gray9
 
@@ -55,6 +55,6 @@ fun StepHeader(
 @Preview
 @Composable
 private fun StepHeaderPreview() {
-  val step = CreateAccountStep.CreateWallet
+  val step = CreateWalletStep.CreatePassword
   StepHeader(title = step.title(), description = step.description())
 }

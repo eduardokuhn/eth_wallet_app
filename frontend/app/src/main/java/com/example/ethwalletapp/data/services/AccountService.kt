@@ -20,11 +20,16 @@ import javax.inject.Singleton
 
 @Singleton
 class AccountService @Inject constructor() {
-  private val saltPhrase: String = "Eduardo is lovely"
+  private val saltPhrase: String = "Eduardo Giant Biceps"
 
   fun generateSecretRecoveryPhrase(): String {
     // Create a new 12-word mnemonic phrase (secret recovery phrase)
     return generateMnemonic(128, WORDLIST_ENGLISH)
+  }
+
+  fun validateSecretRecoveryPhrase(secretRecoveryPhrase: String): Boolean {
+    val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
+    return mnemonicWords.validate(mnemonicWords.words)
   }
 
   fun createMasterAccount(secretRecoveryPhrase: String): ECKeyPair {

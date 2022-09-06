@@ -1,7 +1,4 @@
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,8 +9,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.ethwalletapp.shared.components.SecondaryButton
 import com.example.ethwalletapp.shared.navigation.Screen
-import com.example.ethwalletapp.shared.theme.Gray21
 import com.example.ethwalletapp.shared.theme.Gray24
 
 
@@ -28,6 +25,7 @@ fun StartScreen(navController: NavController?) {
       modifier = Modifier
         .padding(padding)
         .fillMaxSize()
+        .padding(horizontal = 24.dp)
     ) {
       Text(
         text = "Wallet Setup",
@@ -35,25 +33,16 @@ fun StartScreen(navController: NavController?) {
         color = Color.White,
       )
       Spacer(modifier = Modifier.height(36.dp))
-      Button(
-        onClick = { /*TODO*/ },
-        colors = ButtonDefaults.buttonColors(backgroundColor = Gray21),
-        shape = RoundedCornerShape(50.dp),
-        modifier = Modifier
-          .height(56.dp)
-          .padding(horizontal = 24.dp)
-          .fillMaxWidth()
-      ) {
-        Text(
-          text = "Import Using Recovery Phrase",
-          fontSize = 16.sp,
-          color = Color.White,
-        )
-      }
+      SecondaryButton(
+        onClick = { navController?.navigate(Screen.ImportWalletScreen.route) },
+        text = "Import Using Recovery Phrase",
+        modifier = Modifier.fillMaxWidth()
+      )
       Spacer(modifier = Modifier.height(16.dp))
       PrimaryButton(
-        onClick = { navController?.navigate(Screen.CreateAccountScreen.route) },
-        text = "Create a New Wallet"
+        onClick = { navController?.navigate(Screen.CreateWalletScreen.route) },
+        text = "Create a New Wallet",
+        modifier = Modifier.fillMaxWidth()
       )
       Spacer(modifier = Modifier.height(66.dp))
     }
