@@ -1,6 +1,6 @@
 package com.example.ethwalletapp.shared.hilt
 
-import com.example.ethwalletapp.data.data_sources.AppDatabase
+import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
 import com.example.ethwalletapp.data.repositories.AccountRepositoryImpl
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import dagger.Module
@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
   @Provides
-  fun provideAccountRepositoryImpl(appDatabase: AppDatabase) : IAccountRepository {
-    return AccountRepositoryImpl(appDatabase.accountDao())
+  fun provideAccountRepositoryImpl(localAppDatabase: LocalAppDatabase) : IAccountRepository {
+    return AccountRepositoryImpl(localAppDatabase.accountDao())
   }
 }

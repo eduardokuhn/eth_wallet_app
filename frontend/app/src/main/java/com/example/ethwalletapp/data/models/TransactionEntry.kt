@@ -7,8 +7,10 @@ import androidx.room.PrimaryKey
 import org.kethereum.DEFAULT_GAS_LIMIT
 import org.kethereum.model.Address
 import org.kethereum.model.SignatureData
+import org.kethereum.model.Transaction
 import java.math.BigInteger
 
+/*
 data class Transaction(
   val to: Address,
   val from: Address,
@@ -23,6 +25,7 @@ data class Transaction(
   @ColumnInfo(name = "chain_id")
   val chainId: BigInteger
 )
+ */
 
 data class TransactionState(
   val signed: Boolean = false,

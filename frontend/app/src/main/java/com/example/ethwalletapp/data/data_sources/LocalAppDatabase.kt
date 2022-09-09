@@ -18,6 +18,6 @@ import com.example.ethwalletapp.shared.utils.RoomDataTypeConverters
   version = 1
 )
 @TypeConverters(RoomDataTypeConverters::class)
-abstract class AppDatabase: RoomDatabase() {
+abstract class LocalAppDatabase: RoomDatabase() {
   abstract fun accountDao(): AccountDao
 }

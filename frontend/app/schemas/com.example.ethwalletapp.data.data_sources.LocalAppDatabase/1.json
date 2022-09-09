@@ -1,0 +1,238 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "837e08367f88f368b3c2aaaae672db32",
+    "entities": [
+      {
+        "tableName": "account",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `name` TEXT NOT NULL, `color` TEXT NOT NULL, `address_index` INTEGER NOT NULL, PRIMARY KEY(`address`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addressIndex",
+            "columnName": "address_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "address"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "balance",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `chain_id` BLOB NOT NULL, `token_address` TEXT NOT NULL, `balance` BLOB NOT NULL, `block` INTEGER NOT NULL, PRIMARY KEY(`address`, `chain_id`, `token_address`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chain_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenAddress",
+            "columnName": "token_address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "block",
+            "columnName": "block",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "address",
+            "chain_id",
+            "token_address"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "transaction",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, `chain` BLOB, `creationEpochSecond` INTEGER, `from` TEXT, `gasLimit` BLOB, `gasPrice` BLOB, `input` BLOB NOT NULL, `nonce` BLOB, `to` TEXT, `txHash` TEXT, `value` BLOB, `blockHash` TEXT, `blockNumber` BLOB, `maxPriorityFeePerGas` BLOB, `maxFeePerGas` BLOB, `r` BLOB, `s` BLOB, `v` BLOB, `signed` INTEGER NOT NULL, `is_pending` INTEGER NOT NULL, `error` TEXT, PRIMARY KEY(`hash`))",
+        "fields": [
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.chain",
+            "columnName": "chain",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.creationEpochSecond",
+            "columnName": "creationEpochSecond",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.from",
+            "columnName": "from",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.gasLimit",
+            "columnName": "gasLimit",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.gasPrice",
+            "columnName": "gasPrice",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.input",
+            "columnName": "input",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.nonce",
+            "columnName": "nonce",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.to",
+            "columnName": "to",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.txHash",
+            "columnName": "txHash",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.value",
+            "columnName": "value",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.blockHash",
+            "columnName": "blockHash",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.blockNumber",
+            "columnName": "blockNumber",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.maxPriorityFeePerGas",
+            "columnName": "maxPriorityFeePerGas",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.maxFeePerGas",
+            "columnName": "maxFeePerGas",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signatureData.r",
+            "columnName": "r",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signatureData.s",
+            "columnName": "s",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signatureData.v",
+            "columnName": "v",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "state.signed",
+            "columnName": "signed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state.isPending",
+            "columnName": "is_pending",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state.error",
+            "columnName": "error",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "hash"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '837e08367f88f368b3c2aaaae672db32')"
+    ]
+  }
+}

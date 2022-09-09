@@ -13,7 +13,7 @@ import org.kethereum.keystore.api.KeyStore
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
   @Provides
-  fun provideServiceModule(
+  fun provideAccountService(
     keyStore: KeyStore,
     accountRepository: IAccountRepository
   ) : IAccountService {

@@ -3,7 +3,7 @@ package com.example.ethwalletapp.shared.hilt
 import android.content.Context
 import androidx.room.Room
 import com.example.ethwalletapp.data.data_sources.daos.AccountDao
-import com.example.ethwalletapp.data.data_sources.AppDatabase
+import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,16 +16,16 @@ import javax.inject.Singleton
 object DatabaseModule {
   @Singleton
   @Provides
-  fun provideAccountDao(appDatabase: AppDatabase) : AccountDao {
+  fun provideAccountDao(appDatabase: LocalAppDatabase) : AccountDao {
     return appDatabase.accountDao()
   }
 
   @Singleton
   @Provides
-  fun provideLocalAppDatabase(@ApplicationContext context: Context) : AppDatabase {
+  fun provideLocalAppDatabase(@ApplicationContext context: Context) : LocalAppDatabase {
     return Room.databaseBuilder(
       context,
-      AppDatabase::class.java,
+      LocalAppDatabase::class.java,
       "crypto-wallet-local-database"
     ).build()
   }
