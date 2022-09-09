@@ -3,6 +3,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,12 +22,13 @@ fun PrimaryButton(
   onClick: () -> Unit,
   text: String,
   disabled: Boolean = false,
+  isLoading: Boolean = false,
   modifier: Modifier = Modifier
 ) {
   Button(
-    onClick = { if (!disabled) onClick() },
-    colors = ButtonDefaults.buttonColors(backgroundColor = if (!disabled) Color.Transparent else Gray23),
+    onClick = { if (!disabled && !isLoading) onClick() },
     shape = RoundedCornerShape(50.dp),
+    colors = ButtonDefaults.buttonColors(backgroundColor = if (!disabled) Color.Transparent else Gray23),
     contentPadding = PaddingValues(0.dp),
     modifier = modifier
       .height(56.dp)
@@ -39,11 +41,14 @@ fun PrimaryButton(
           .padding(horizontal = 16.dp)
           .fillMaxSize()
       ) {
-        Text(
-          text = text,
-          fontSize = 16.sp,
-          color = Color.White,
-        )
+        if (isLoading)
+          CircularProgressIndicator(color = Color.White)
+        else
+          Text(
+            text = text,
+            fontSize = 16.sp,
+            color = Color.White,
+          )
       }
     else
       Text(
@@ -57,6 +62,12 @@ fun PrimaryButton(
 
 @Preview
 @Composable
-fun PrimaryButtonPreview() {
+private fun PrimaryButtonPreview() {
   PrimaryButton(onClick = {}, text = "Enter")
+}
+
+@Preview
+@Composable
+private fun PrimaryButtonLoadingPreview() {
+  PrimaryButton(onClick = {}, text = "Enter", isLoading = true)
 }

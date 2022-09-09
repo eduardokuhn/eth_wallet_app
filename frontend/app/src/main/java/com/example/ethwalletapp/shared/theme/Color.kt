@@ -27,5 +27,4 @@ val Gray24 = Color(0xFF080A0C)
 
 val Green5 = Color(0xFF76E268)
 val Red6 = Color(0xFFE8212B)
-
-val Mask = Color(0xFF222531).copy(alpha = 0.6f)
+val Blue5 = Color(0xFF5F97FF)

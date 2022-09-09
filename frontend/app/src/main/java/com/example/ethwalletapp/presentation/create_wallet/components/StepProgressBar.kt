@@ -76,7 +76,7 @@ private fun SecureWalletStepProgressBarPreview() {
 
 @Preview
 @Composable
-private fun ConfirmStepProgressBarPreview3() {
+private fun ConfirmStepProgressBarPreview() {
   StepProgressBar(currentStep = CreateWalletStep.ConfirmSecretRecoveryPhrase)
 }
 

@@ -3,7 +3,7 @@ package com.example.ethwalletapp.presentation.create_wallet
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.ethwalletapp.data.services.AccountService
+import com.example.ethwalletapp.data.services.IAccountService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -54,6 +54,7 @@ data class CreateWalletScreenUIState(
   val secretRecoveryPhraseConfirmation: String = "",
   val showSecretRecoveryPhrase: Boolean = false,
   val isSRPConfirmed: Boolean = false,
+  val isLoading: Boolean = false,
 )
 
 interface ICreateAccountViewModel {
@@ -64,14 +65,31 @@ interface ICreateAccountViewModel {
   fun toggleShowPasswordConfirmation()
   fun toggleIsChecked(value: Boolean)
   fun createPassword(): Boolean
+  suspend fun createWallet(): Boolean
   fun setCurrentStep(step: CreateWalletStep)
   fun toggleShowSecretRecoveryPhrase()
   fun setSecretRecoveryPhraseConfirmation(value: String)
 }
 
+class CreateWalletViewModelMock: ICreateAccountViewModel {
+  override var uiState: MutableState<CreateWalletScreenUIState>
+    get() = mutableStateOf(CreateWalletScreenUIState())
+    set(value) { print(value) }
+  override fun setPassword(value: String) {}
+  override fun setPasswordConfirmation(value: String) {}
+  override fun toggleShowPassword() {}
+  override fun toggleShowPasswordConfirmation() {}
+  override fun toggleIsChecked(value: Boolean) {}
+  override fun createPassword(): Boolean { return true }
+  override suspend fun createWallet(): Boolean { return true }
+  override fun setCurrentStep(step: CreateWalletStep) {}
+  override fun toggleShowSecretRecoveryPhrase() {}
+  override fun setSecretRecoveryPhraseConfirmation(value: String) {}
+}
+
 @HiltViewModel
 class CreateWalletViewModel @Inject constructor(
-  private val accountService: AccountService
+  private val accountService: IAccountService
 ) : ViewModel(), ICreateAccountViewModel {
   override var uiState = mutableStateOf(CreateWalletScreenUIState())
 
@@ -100,22 +118,32 @@ class CreateWalletViewModel @Inject constructor(
   }
 
   override fun createPassword(): Boolean {
-    return if (uiState.value.isPasswordValid && uiState.value.isChecked) {
+    if (uiState.value.isPasswordValid && uiState.value.isChecked) {
       val srp = accountService.generateSecretRecoveryPhrase()
       uiState.value = uiState.value.copy(
         hasError = false,
         passwordHelperText = "Must be at least 8 characters",
         secretRecoveryPhrase = srp
       )
-      true
+      return true
     } else {
       uiState.value = uiState.value.copy(
         hasError = true,
         passwordHelperText = "Password does not match the requirements",
         secretRecoveryPhrase = ""
       )
-      false
+      return false
     }
+  }
+
+  override suspend fun createWallet(): Boolean {
+    return if (uiState.value.isSRPConfirmed) {
+      uiState.value = uiState.value.copy(isLoading = true)
+      accountService.createMasterAccount(uiState.value.secretRecoveryPhrase, uiState.value.password)
+      uiState.value = uiState.value.copy(isLoading = false)
+
+      true
+    } else false
   }
 
   override fun setCurrentStep(step: CreateWalletStep) {
@@ -127,7 +155,7 @@ class CreateWalletViewModel @Inject constructor(
   }
 
   override fun setSecretRecoveryPhraseConfirmation(value: String) {
-    uiState.value = uiState.value.copy(secretRecoveryPhraseConfirmation = value.trim())
+    uiState.value = uiState.value.copy(secretRecoveryPhraseConfirmation = value)
     confirmSecretRecoveryPhrase()
   }
 
@@ -147,19 +175,4 @@ class CreateWalletViewModel @Inject constructor(
     else
       uiState.value = uiState.value.copy(isPasswordValid = false)
   }
-}
-
-class CreateWalletViewModelMock: ICreateAccountViewModel {
-  override var uiState: MutableState<CreateWalletScreenUIState>
-    get() = mutableStateOf(CreateWalletScreenUIState())
-    set(value) { print(value) }
-  override fun setPassword(value: String) {}
-  override fun setPasswordConfirmation(value: String) {}
-  override fun toggleShowPassword() {}
-  override fun toggleShowPasswordConfirmation() {}
-  override fun toggleIsChecked(value: Boolean) {}
-  override fun createPassword(): Boolean { return true }
-  override fun setCurrentStep(step: CreateWalletStep) {}
-  override fun toggleShowSecretRecoveryPhrase() {}
-  override fun setSecretRecoveryPhraseConfirmation(value: String) {}
 }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.Gray24
+import kotlinx.coroutines.launch
 
 @Composable
 fun ImportWalletScreen(
@@ -31,6 +33,7 @@ fun ImportWalletScreen(
   viewModel: IImportWalletViewModel
 ) {
   val uiState = viewModel.uiState.value
+  val scope = rememberCoroutineScope()
 
   Scaffold(
     backgroundColor = Gray24
@@ -62,8 +65,8 @@ fun ImportWalletScreen(
       }
       Spacer(modifier = Modifier.height(40.dp))
       TextInput(
-        value = "",
-        onValueChange = {},
+        value = uiState.secretRecoveryPhrase,
+        onValueChange = viewModel::setSecretRecoveryPhrase,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation =
         if (uiState.showSecretRecoveryPhrase) VisualTransformation.None
@@ -71,13 +74,13 @@ fun ImportWalletScreen(
         label = "Secret Recovery Phrase",
         trailingIcon = {
           IconButton(
-            onClick = viewModel::toggleShowPassword,
+            onClick = viewModel::toggleShowSecretRecoveryPhrase,
           ) {
             Icon(
-              if (uiState.showPassword) Icons.Outlined.VisibilityOff
+              if (uiState.showSecretRecoveryPhrase) Icons.Outlined.VisibilityOff
               else Icons.Outlined.Visibility,
               contentDescription =
-              if (uiState.showPassword) "Hide secret recovery phrase"
+              if (uiState.showSecretRecoveryPhrase) "Hide secret recovery phrase"
               else "Show secret recovery phrase",
               tint = Color.White
             )
@@ -88,12 +91,12 @@ fun ImportWalletScreen(
       )
       Spacer(modifier = Modifier.height(24.dp))
       TextInput(
-        value = "",
-        onValueChange = { },
+        value = uiState.password,
+        onValueChange = viewModel::setPassword,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation =
-        if (uiState.showPassword) VisualTransformation.None
-        else PasswordVisualTransformation(),
+          if (uiState.showPassword) VisualTransformation.None
+          else PasswordVisualTransformation(),
         label = "Password",
         trailingIcon = {
           IconButton(
@@ -103,8 +106,8 @@ fun ImportWalletScreen(
               if (uiState.showPassword) Icons.Outlined.VisibilityOff
               else Icons.Outlined.Visibility,
               contentDescription =
-              if (uiState.showPassword) "Hide password"
-              else "Show password",
+                if (uiState.showPassword) "Hide password"
+                else "Show password",
               tint = Color.White
             )
           }
@@ -118,8 +121,8 @@ fun ImportWalletScreen(
         onValueChange = viewModel::setPasswordConfirmation,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation =
-        if (uiState.showPasswordConfirmation) VisualTransformation.None
-        else PasswordVisualTransformation(),
+          if (uiState.showPasswordConfirmation) VisualTransformation.None
+          else PasswordVisualTransformation(),
         label = "Password Confirmation",
         trailingIcon = {
           IconButton(
@@ -129,8 +132,8 @@ fun ImportWalletScreen(
               if (uiState.showPasswordConfirmation) Icons.Outlined.VisibilityOff
               else Icons.Outlined.Visibility,
               contentDescription =
-              if (uiState.showPasswordConfirmation) "Hide password"
-              else "Show password",
+                if (uiState.showPasswordConfirmation) "Hide password"
+                else "Show password",
               tint = Color.White
             )
           }
@@ -140,9 +143,16 @@ fun ImportWalletScreen(
       )
       Spacer(Modifier.weight(1f))
       PrimaryButton(
-        onClick = { },
+        onClick = {
+          scope.launch {
+            val success = viewModel.importWallet()
+            if (success)
+              navController?.navigate(Screen.HomeScreen.route)
+          }
+        },
         text = "Import",
-        disabled = !(uiState.isPasswordValid && uiState.isSRPValid),
+        disabled = !(uiState.password.isNotEmpty() && uiState.secretRecoveryPhrase.isNotEmpty()),
+        isLoading = uiState.isLoading,
         modifier = Modifier.fillMaxWidth()
       )
       Spacer(Modifier.height(42.dp))

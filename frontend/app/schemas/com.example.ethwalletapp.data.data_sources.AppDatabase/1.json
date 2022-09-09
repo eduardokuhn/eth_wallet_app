@@ -1,0 +1,202 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "5ddcff3dee76b48ed516a7e59c3a066c",
+    "entities": [
+      {
+        "tableName": "account",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `name` TEXT NOT NULL, `color` TEXT NOT NULL, `address_index` INTEGER NOT NULL, PRIMARY KEY(`address`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addressIndex",
+            "columnName": "address_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "address"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "balance",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `chain_id` BLOB NOT NULL, `token_address` TEXT NOT NULL, `balance` BLOB NOT NULL, `block` INTEGER NOT NULL, PRIMARY KEY(`address`, `chain_id`, `token_address`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chain_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenAddress",
+            "columnName": "token_address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "block",
+            "columnName": "block",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "address",
+            "chain_id",
+            "token_address"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "transaction",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, `to` TEXT NOT NULL, `from` TEXT NOT NULL, `value` BLOB, `gas_limit` BLOB, `max_priority_fee_per_gas` BLOB, `max_fee_per_gas` BLOB, `nonce` BLOB NOT NULL, `chain_id` BLOB NOT NULL, `r` BLOB, `s` BLOB, `v` BLOB, `signed` INTEGER NOT NULL, `is_pending` INTEGER NOT NULL, `error` TEXT, PRIMARY KEY(`hash`))",
+        "fields": [
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.to",
+            "columnName": "to",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.from",
+            "columnName": "from",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.value",
+            "columnName": "value",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.gasLimit",
+            "columnName": "gas_limit",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.maxPriorityFeePerGas",
+            "columnName": "max_priority_fee_per_gas",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.maxFeePerGas",
+            "columnName": "max_fee_per_gas",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transaction.nonce",
+            "columnName": "nonce",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction.chainId",
+            "columnName": "chain_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signatureData.r",
+            "columnName": "r",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signatureData.s",
+            "columnName": "s",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signatureData.v",
+            "columnName": "v",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "state.signed",
+            "columnName": "signed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state.isPending",
+            "columnName": "is_pending",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state.error",
+            "columnName": "error",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "hash"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5ddcff3dee76b48ed516a7e59c3a066c')"
+    ]
+  }
+}

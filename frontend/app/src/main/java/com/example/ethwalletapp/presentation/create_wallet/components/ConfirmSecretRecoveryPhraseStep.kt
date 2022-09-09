@@ -33,7 +33,7 @@ fun ConfirmSecretRecoveryPhraseStep(
     )
     Spacer(Modifier.height(64.dp))
     BasicTextField(
-      value = "",
+      value = uiState.secretRecoveryPhraseConfirmation,
       onValueChange = setSecretRecoveryPhraseConfirmation,
       textStyle = LocalTextStyle.current.copy(color = Color.White),
       modifier = Modifier
@@ -54,6 +54,7 @@ fun ConfirmSecretRecoveryPhraseStep(
       onClick = next,
       text = "Next",
       disabled = !uiState.isSRPConfirmed,
+      isLoading = uiState.isLoading,
       modifier = Modifier.fillMaxWidth()
     )
     Spacer(Modifier.height(42.dp))

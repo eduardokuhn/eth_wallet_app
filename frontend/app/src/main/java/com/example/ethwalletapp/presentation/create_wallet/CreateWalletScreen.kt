@@ -81,7 +81,7 @@ fun CreateWalletScreen(
       ) { index ->
         when (index) {
           0 -> CreatePasswordStep(
-            createWallet = {
+            createPassword = {
               val success = viewModel.createPassword()
               if (success) {
                 val step = CreateWalletStep.SecureWallet
@@ -106,7 +106,13 @@ fun CreateWalletScreen(
             toggleShowSecretRecoveryPhrase = viewModel::toggleShowSecretRecoveryPhrase
           )
           2 -> ConfirmSecretRecoveryPhraseStep(
-            next = {},
+            next = {
+              scope.launch {
+                val success = viewModel.createWallet()
+                if (success)
+                  navController?.navigate(Screen.HomeScreen.route)
+              }
+            },
             uiState = uiState,
             setSecretRecoveryPhraseConfirmation = viewModel::setSecretRecoveryPhraseConfirmation
           )

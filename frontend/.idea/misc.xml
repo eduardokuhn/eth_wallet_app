@@ -134,8 +134,46 @@
         <entry key="../../../../../../layout/compose-model-1662505336475.xml" value="0.28055555555555556" />
         <entry key="../../../../../../layout/compose-model-1662505435337.xml" value="0.28055555555555556" />
         <entry key="../../../../../../layout/compose-model-1662505532237.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662538907229.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662538953458.xml" value="0.28055555555555556" />
+        <entry key="../../../../../../layout/compose-model-1662588843321.xml" value="0.2935185185185185" />
+        <entry key="../../../../../../layout/compose-model-1662588918024.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662627340493.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662627348545.xml" value="0.3175925925925926" />
+        <entry key="../../../../../../layout/compose-model-1662627565409.xml" value="0.3175925925925926" />
+        <entry key="../../../../../../layout/compose-model-1662627694990.xml" value="0.3175925925925926" />
+        <entry key="../../../../../../layout/compose-model-1662627717427.xml" value="0.3175925925925926" />
+        <entry key="../../../../../../layout/compose-model-1662630734930.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662642848768.xml" value="0.3175925925925926" />
+        <entry key="../../../../../../layout/compose-model-1662643398426.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662671295506.xml" value="0.33" />
+        <entry key="../../../../../../layout/compose-model-1662671507103.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662673202481.xml" value="0.33" />
+        <entry key="../../../../../../layout/compose-model-1662673509965.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662674390963.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662674402515.xml" value="0.2964876033057851" />
+        <entry key="../../../../../../layout/compose-model-1662674934615.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662675145801.xml" value="0.8913043478260869" />
+        <entry key="../../../../../../layout/compose-model-1662675372387.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662675533172.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662675571169.xml" value="0.1" />
+        <entry key="../../../../../../layout/compose-model-1662675597019.xml" value="0.8913043478260869" />
+        <entry key="../../../../../../layout/compose-model-1662675708670.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662675834152.xml" value="1.0708955223880596" />
+        <entry key="../../../../../../layout/compose-model-1662677508563.xml" value="0.2657407407407407" />
+        <entry key="../../../../../../layout/compose-model-1662679317454.xml" value="0.2638888888888889" />
+        <entry key="../../../../../../layout/compose-model-1662679597992.xml" value="0.33" />
+        <entry key="../../../../../../layout/compose-model-1662713566254.xml" value="0.27685185185185185" />
+        <entry key="../../../../../../layout/compose-model-1662713891686.xml" value="0.27685185185185185" />
+        <entry key="app/src/main/res/drawable/bg_splash.xml" value="0.1715" />
+        <entry key="app/src/main/res/drawable/bg_splash_12.xml" value="0.159" />
+        <entry key="app/src/main/res/drawable/ic_app_logo.xml" value="0.159" />
+        <entry key="app/src/main/res/drawable/ic_ethereum_background.xml" value="0.1435" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1715" />
         <entry key="app/src/main/res/drawable/ic_wallet_illustration.xml" value="0.152" />
         <entry key="app/src/main/res/drawable/wallet_icon.xml" value="0.131" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_ethereum_round.xml" value="0.1435" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1435" />
       </map>
     </option>
   </component>

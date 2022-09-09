@@ -24,7 +24,7 @@ import com.example.ethwalletapp.shared.theme.Primary5
 
 @Composable
 fun CreatePasswordStep(
-  createWallet: () -> Unit,
+  createPassword: () -> Unit,
   uiState: CreateWalletScreenUIState,
   setPassword: (value: String) -> Unit,
   toggleShowPassword: () -> Unit,
@@ -112,7 +112,7 @@ fun CreatePasswordStep(
     }
     Spacer(modifier = Modifier.weight(1f))
     PrimaryButton(
-      onClick = createWallet,
+      onClick = createPassword,
       text = "Create Password",
       disabled = !(uiState.isChecked && uiState.isPasswordValid),
       modifier = Modifier.fillMaxWidth()
@@ -125,7 +125,7 @@ fun CreatePasswordStep(
 @Composable
 private fun CreateWalletStepPreview() {
   CreatePasswordStep(
-    createWallet = {},
+    createPassword = {},
     uiState = CreateWalletScreenUIState(),
     setPassword = {},
     toggleShowPassword = {},

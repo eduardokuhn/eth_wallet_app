@@ -8,16 +8,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ethwalletapp.presentation.create_wallet.CreateWalletScreen
 import com.example.ethwalletapp.presentation.create_wallet.CreateWalletViewModel
+import com.example.ethwalletapp.presentation.home.HomeScreen
 import com.example.ethwalletapp.presentation.import_wallet.ImportWalletScreen
 import com.example.ethwalletapp.presentation.import_wallet.ImportWalletViewModel
 
 @Composable
-fun Navigator() {
+fun Navigator(startDestination: String) {
   val navController = rememberNavController()
 
   NavHost(
     navController = navController,
-    startDestination = Screen.StartScreen.route
+    startDestination = startDestination
   ) {
     composable(route = Screen.StartScreen.route) { StartScreen(navController) }
     composable(route = Screen.CreateWalletScreen.route) {
@@ -29,7 +30,7 @@ fun Navigator() {
       ImportWalletScreen(navController, viewModel)
     }
     composable(route = Screen.HomeScreen.route) {
-
+      HomeScreen()
     }
   }
 }

@@ -20,6 +20,7 @@ data class ImportWalletScreenUIState(
   val isPasswordValid: Boolean = false,
   val hasPasswordError: Boolean = false,
   val passwordHelperText: String = "Must be at least 8 characters",
+  val isLoading: Boolean = false
 )
 
 interface IImportWalletViewModel {
@@ -30,7 +31,20 @@ interface IImportWalletViewModel {
   fun setPasswordConfirmation(value: String)
   fun toggleShowPassword()
   fun toggleShowPasswordConfirmation()
-  fun importWallet()
+  suspend fun importWallet(): Boolean
+}
+
+class ImportWalletViewModelMock: IImportWalletViewModel {
+  override var uiState: MutableState<ImportWalletScreenUIState>
+    get() = mutableStateOf(ImportWalletScreenUIState())
+    set(value) { print(value) }
+  override fun setSecretRecoveryPhrase(value: String) {}
+  override fun toggleShowSecretRecoveryPhrase() {}
+  override fun setPassword(value: String) {}
+  override fun setPasswordConfirmation(value: String) {}
+  override fun toggleShowPassword() {}
+  override fun toggleShowPasswordConfirmation() {}
+  override suspend fun importWallet(): Boolean { return true }
 }
 
 @HiltViewModel
@@ -40,9 +54,9 @@ class ImportWalletViewModel @Inject constructor(
   override var uiState = mutableStateOf(ImportWalletScreenUIState())
 
   override fun setSecretRecoveryPhrase(value: String) {
-    val valid = accountService.validateSecretRecoveryPhrase(value.trim())
+    val valid = accountService.validateSecretRecoveryPhrase(value)
     uiState.value = uiState.value.copy(
-      secretRecoveryPhrase = value.trim(),
+      secretRecoveryPhrase = value,
       isSRPValid = valid
     )
   }
@@ -69,8 +83,23 @@ class ImportWalletViewModel @Inject constructor(
     uiState.value = uiState.value.copy(showPasswordConfirmation = !uiState.value.showPasswordConfirmation)
   }
 
-  override fun importWallet() {
-    TODO("Not yet implemented")
+  override suspend fun importWallet(): Boolean {
+    uiState.value = uiState.value.copy(
+      isLoading = uiState.value.isSRPValid && uiState.value.isPasswordValid,
+      hasSRPError = !uiState.value.isSRPValid,
+      srpHelperText =
+        if (!uiState.value.isSRPValid) "Invalid secret recovery phrase"
+        else null,
+      hasPasswordError = !uiState.value.isPasswordValid,
+      passwordHelperText =
+        if (!uiState.value.isPasswordValid) "Must be at least 8 characters"
+        else "Password does not match the requirements",
+    )
+    return if (uiState.value.isSRPValid && uiState.value.isPasswordValid) {
+      accountService.importMasterAccount(uiState.value.secretRecoveryPhrase, uiState.value.password)
+      uiState.value = uiState.value.copy(isLoading = false)
+      true
+    } else false
   }
 
   private fun validatePassword() {
@@ -82,17 +111,4 @@ class ImportWalletViewModel @Inject constructor(
     else
       uiState.value = uiState.value.copy(isPasswordValid = false)
   }
-}
-
-class ImportWalletViewModelMock: IImportWalletViewModel {
-  override var uiState: MutableState<ImportWalletScreenUIState>
-    get() = mutableStateOf(ImportWalletScreenUIState())
-    set(value) { print(value) }
-  override fun setSecretRecoveryPhrase(value: String) {}
-  override fun toggleShowSecretRecoveryPhrase() {}
-  override fun setPassword(value: String) {}
-  override fun setPasswordConfirmation(value: String) {}
-  override fun toggleShowPassword() {}
-  override fun toggleShowPasswordConfirmation() {}
-  override fun importWallet() {}
 }
