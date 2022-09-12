@@ -1,11 +1,15 @@
 package com.example.ethwalletapp.shared.hilt
 
+import android.content.Context
 import com.example.ethwalletapp.data.repositories.IAccountRepository
-import com.example.ethwalletapp.data.services.AccountService
+import com.example.ethwalletapp.data.services.AccountServiceImpl
+import com.example.ethwalletapp.data.services.ConnectivityServiceImpl
 import com.example.ethwalletapp.data.services.IAccountService
+import com.example.ethwalletapp.data.services.IConnectivityService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.kethereum.keystore.api.KeyStore
 
@@ -13,10 +17,15 @@ import org.kethereum.keystore.api.KeyStore
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
   @Provides
-  fun provideAccountService(
+  fun provideAccountServiceImpl(
     keyStore: KeyStore,
     accountRepository: IAccountRepository
   ) : IAccountService {
-    return AccountService(keyStore, accountRepository)
+    return AccountServiceImpl(keyStore, accountRepository)
+  }
+
+  @Provides
+  fun provideConnectivityServiceImpl(@ApplicationContext context: Context): IConnectivityService {
+    return ConnectivityServiceImpl(context)
   }
 }

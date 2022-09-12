@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "837e08367f88f368b3c2aaaae672db32",
+    "identityHash": "4c01d4e44c427e63619681be29547a86",
     "entities": [
       {
         "tableName": "account",
@@ -44,11 +44,17 @@
       },
       {
         "tableName": "balance",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `chain_id` BLOB NOT NULL, `token_address` TEXT NOT NULL, `balance` BLOB NOT NULL, `block` INTEGER NOT NULL, PRIMARY KEY(`address`, `chain_id`, `token_address`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `token_address` TEXT NOT NULL, `chain_id` BLOB NOT NULL, `balance` BLOB NOT NULL, PRIMARY KEY(`address`, `token_address`, `chain_id`))",
         "fields": [
           {
             "fieldPath": "address",
             "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenAddress",
+            "columnName": "token_address",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -59,29 +65,17 @@
             "notNull": true
           },
           {
-            "fieldPath": "tokenAddress",
-            "columnName": "token_address",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "balance",
             "columnName": "balance",
             "affinity": "BLOB",
-            "notNull": true
-          },
-          {
-            "fieldPath": "block",
-            "columnName": "block",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
             "address",
-            "chain_id",
-            "token_address"
+            "token_address",
+            "chain_id"
           ],
           "autoGenerate": false
         },
@@ -232,7 +226,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '837e08367f88f368b3c2aaaae672db32')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c01d4e44c427e63619681be29547a86')"
     ]
   }
 }

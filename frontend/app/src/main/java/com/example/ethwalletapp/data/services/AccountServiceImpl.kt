@@ -37,7 +37,7 @@ interface IAccountService {
 }
 
 @Singleton
-class AccountService @Inject constructor(
+class AccountServiceImpl @Inject constructor(
   private val keyStore: KeyStore,
   private val accountRepository: IAccountRepository
 ) : IAccountService {

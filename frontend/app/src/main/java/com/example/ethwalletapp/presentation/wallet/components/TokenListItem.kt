@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.home.components
+package com.example.ethwalletapp.presentation.wallet.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -24,7 +24,7 @@ fun TokenListItem(
   icon: Painter,
   name: String,
   abbr: String,
-  value: BigInteger,
+  value: Double,
   balance: BigInteger,
 ) {
   Row(
@@ -70,7 +70,7 @@ private fun TokenListItemPreview() {
     icon = painterResource(R.drawable.ic_ethereum),
     name = "Ethereum",
     abbr = "ETH",
-    value = BigInteger.valueOf(1600),
+    value = 1600.00,
     balance = BigInteger.valueOf(8)
   )
 }

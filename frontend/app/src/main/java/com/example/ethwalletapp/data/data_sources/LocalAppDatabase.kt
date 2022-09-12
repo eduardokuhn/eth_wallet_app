@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.ethwalletapp.data.data_sources.daos.AccountDao
+import com.example.ethwalletapp.data.data_sources.daos.BalanceDao
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.models.TransactionEntry
@@ -20,4 +21,5 @@ import com.example.ethwalletapp.shared.utils.RoomDataTypeConverters
 @TypeConverters(RoomDataTypeConverters::class)
 abstract class LocalAppDatabase: RoomDatabase() {
   abstract fun accountDao(): AccountDao
+  abstract fun balanceDao(): BalanceDao
 }

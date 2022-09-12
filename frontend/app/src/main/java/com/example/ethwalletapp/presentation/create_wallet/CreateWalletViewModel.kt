@@ -72,9 +72,7 @@ interface ICreateAccountViewModel {
 }
 
 class CreateWalletViewModelMock: ICreateAccountViewModel {
-  override var uiState: MutableState<CreateWalletScreenUIState>
-    get() = mutableStateOf(CreateWalletScreenUIState())
-    set(value) { print(value) }
+  override var uiState = mutableStateOf(CreateWalletScreenUIState())
   override fun setPassword(value: String) {}
   override fun setPasswordConfirmation(value: String) {}
   override fun toggleShowPassword() {}

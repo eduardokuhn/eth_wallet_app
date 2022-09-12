@@ -7,19 +7,19 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ethwalletapp.presentation.home.components.SettingsView
-import com.example.ethwalletapp.presentation.home.components.WalletView
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.ethwalletapp.presentation.settings.SettingsView
+import com.example.ethwalletapp.presentation.wallet.WalletView
+import com.example.ethwalletapp.presentation.wallet.WalletViewViewModel
 import com.example.ethwalletapp.shared.theme.*
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.CoroutineScope
@@ -59,14 +59,17 @@ private fun HomeScreenPreview() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun TabContent(screenCount: Int, pagerState: PagerState, modifier: Modifier) {
+private fun TabContent(viewCount: Int, pagerState: PagerState, modifier: Modifier) {
   HorizontalPager(
-    count = screenCount,
+    count = viewCount,
     state = pagerState,
     modifier = modifier
   ) { page ->
     when (page) {
-      0 -> WalletView()
+      0 -> {
+        val viewModel: WalletViewViewModel = hiltViewModel()
+        WalletView(viewModel)
+      }
       1 -> SettingsView()
     }
   }

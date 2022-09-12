@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.ethwalletapp.data.data_sources.daos.AccountDao
 import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
+import com.example.ethwalletapp.data.data_sources.daos.BalanceDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,12 @@ object DatabaseModule {
   @Provides
   fun provideAccountDao(appDatabase: LocalAppDatabase) : AccountDao {
     return appDatabase.accountDao()
+  }
+
+  @Singleton
+  @Provides
+  fun provideBalanceDao(appDatabase: LocalAppDatabase) : BalanceDao {
+    return appDatabase.balanceDao()
   }
 
   @Singleton

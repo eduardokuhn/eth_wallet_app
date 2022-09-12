@@ -44,7 +44,6 @@ fun CreateWalletScreen(
       Box(Modifier.fillMaxWidth()) {
         IconButton(
           onClick = {
-            println(pagerState.currentPage)
             when (pagerState.currentPage) {
               0 -> navController?.navigate(Screen.StartScreen.route)
               1 -> {

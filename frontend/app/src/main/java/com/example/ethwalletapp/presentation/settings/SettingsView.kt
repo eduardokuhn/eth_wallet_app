@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.home.components
+package com.example.ethwalletapp.presentation.settings
 
 import androidx.compose.runtime.Composable
 

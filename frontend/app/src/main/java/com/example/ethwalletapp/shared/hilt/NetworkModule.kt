@@ -15,10 +15,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApiModule {
+object NetworkModule {
   @Singleton
   @Provides
-  fun provideOkHttpClient() =
+  fun provideOkHttpClient(): OkHttpClient =
     if (BuildConfig.DEBUG) {
       val loggingInterceptor = HttpLoggingInterceptor()
       loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)

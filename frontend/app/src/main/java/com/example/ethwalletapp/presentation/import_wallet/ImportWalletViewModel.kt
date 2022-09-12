@@ -3,7 +3,7 @@ package com.example.ethwalletapp.presentation.import_wallet
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.ethwalletapp.data.services.AccountService
+import com.example.ethwalletapp.data.services.IAccountService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -49,7 +49,7 @@ class ImportWalletViewModelMock: IImportWalletViewModel {
 
 @HiltViewModel
 class ImportWalletViewModel @Inject constructor(
-  private val accountService: AccountService
+  private val accountService: IAccountService
 ): ViewModel(), IImportWalletViewModel {
   override var uiState = mutableStateOf(ImportWalletScreenUIState())
 

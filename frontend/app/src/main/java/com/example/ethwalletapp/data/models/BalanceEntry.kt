@@ -5,11 +5,12 @@ import androidx.room.Entity
 import org.kethereum.model.Address
 import java.math.BigInteger
 
-@Entity(tableName = "balance", primaryKeys = ["address", "chain_id"])
+@Entity(tableName = "balance", primaryKeys = ["address", "token_address", "chain_id"])
 data class BalanceEntry(
   val address: Address,
+  @ColumnInfo(name = "token_address")
+  val tokenAddress: Address,
   @ColumnInfo(name = "chain_id")
   val chainId: BigInteger,
-  @ColumnInfo(name = "token_address")
   val balance: BigInteger
 )

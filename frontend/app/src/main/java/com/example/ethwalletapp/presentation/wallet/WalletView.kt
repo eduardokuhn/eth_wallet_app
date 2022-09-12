@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.home.components
+package com.example.ethwalletapp.presentation.wallet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,18 +25,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.R
+import com.example.ethwalletapp.presentation.wallet.components.TokenListItem
 import com.example.ethwalletapp.shared.components.SecondaryButton
 import com.example.ethwalletapp.shared.theme.Gradient07
 import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.theme.Primary5
+import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import java.math.BigInteger
 
 @Composable
-fun WalletView() {
+fun WalletView(
+  viewModel: IWalletViewViewModel
+) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier.fillMaxSize()
   ) {
+    val uiState = viewModel.uiState.value
+
     Spacer(Modifier.height(44.dp))
     Box(Modifier.fillMaxWidth()) {
       Box(
@@ -44,7 +50,7 @@ fun WalletView() {
           .clickable { }
           .size(36.dp)
           .align(Alignment.CenterStart)
-          .background(Green5, CircleShape)
+          .background(uiState.selectedAccount.color, CircleShape)
       ) {
         Box(
           modifier = Modifier
@@ -67,21 +73,21 @@ fun WalletView() {
           .align(Alignment.Center)
       ) {
         Text(
-          text = "Network Name",
+          text = uiState.network.toString(),
           fontSize = 13.sp,
           color = Color.White
         )
         Spacer(Modifier.width(4.dp))
         Icon(
           Icons.Outlined.ArrowDropDown,
-          contentDescription = "Switch network",
+          contentDescription = "Change network",
           tint = Color.White
         )
       }
     }
     Spacer(Modifier.height(48.dp))
     Text(
-      text = "9.2362 ETH",
+      text = "${EthereumUnitConverter.weiToEther(uiState.selectedAccountBalance.balance)} ETH",
       fontSize = 40.sp,
       modifier = Modifier
         .graphicsLayer(alpha = 0.99f)
@@ -95,7 +101,7 @@ fun WalletView() {
     )
     Spacer(Modifier.height(20.dp))
     Text(
-      text = "$16,868.00",
+      text = "$${uiState.etherUsdPrice}",
       fontSize = 15.sp,
       color = Color.White
     )
@@ -139,8 +145,8 @@ fun WalletView() {
       icon = painterResource(R.drawable.ic_ethereum),
       name = "Ethereum",
       abbr = "ETH",
-      value = BigInteger.valueOf(1600),
-      balance = BigInteger.valueOf(8)
+      value = uiState.etherUsdPrice,
+      balance = uiState.selectedAccountBalance.balance
     )
   }
 }
@@ -148,5 +154,5 @@ fun WalletView() {
 @Preview
 @Composable
 private fun WalletViewPreview() {
-  WalletView()
+  WalletView(WalletViewViewModelMock())
 }
