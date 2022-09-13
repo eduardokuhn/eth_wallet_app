@@ -44,7 +44,7 @@ fun TextInput(
         Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
-            // TODO fix padding right
+            // TODO: fix padding right
             .padding(horizontal = 16.dp)
             .fillMaxSize()
         ) {

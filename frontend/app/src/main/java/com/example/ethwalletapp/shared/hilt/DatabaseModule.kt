@@ -1,6 +1,7 @@
 package com.example.ethwalletapp.shared.hilt
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.ethwalletapp.data.data_sources.daos.AccountDao
 import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
@@ -35,5 +36,11 @@ object DatabaseModule {
       LocalAppDatabase::class.java,
       "crypto-wallet-local-database"
     ).build()
+  }
+
+  @Singleton
+  @Provides
+  fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+    return context.getSharedPreferences("crypto-wallet-preferences", Context.MODE_PRIVATE)
   }
 }

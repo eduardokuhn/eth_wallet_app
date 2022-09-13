@@ -1,5 +1,6 @@
 package com.example.ethwalletapp.data.data_sources
 
+import com.example.ethwalletapp.shared.utils.Env
 import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
@@ -15,25 +16,25 @@ interface IEthereumApi {
 }
 
 interface EtherscanApi : IEthereumApi {
-  @GET("api?module=stats&action=ethprice&apikey=YourApiKeyToken")
+  @GET("api?module=stats&action=ethprice&apikey=${Env.ETHERSCAN_API_TOKEN}")
   override suspend fun price(): Response<JsonObject>
 
-  @GET("api?module=account&action=balance&address={address}&tag=latest&apikey=YourApiKeyToken")
-  override suspend fun balance(@Path("address") address: String): Response<JsonObject>
+  @GET("api?module=account&action=balance&tag=latest&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun balance(@Query("address") address: String): Response<JsonObject>
 
-  @GET("api?module=account&action=balancemulti&address={addresses}&tag=latest&apikey=YourApiKeyToken")
-  override suspend fun balances(@Path("addresses") addresses: String): Response<JsonObject>
+  @GET("api?module=account&action=balancemulti&tag=latest&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun balances(@Query("address") addresses: String): Response<JsonObject>
 
-  @GET("api?module=transaction&action=gettxreceiptstatus&txhash={hash}&apikey=YourApiKeyToken")
-  override suspend fun txReceiptStatus(@Path("hash") hash: String): Response<JsonObject>
+  @GET("api?module=transaction&action=gettxreceiptstatus&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun txReceiptStatus(@Query("txhash") hash: String): Response<JsonObject>
 
-  @GET("api?module=proxy&action=eth_getTransactionByHash&txhash={hash}&apikey=YourApiKeyToken")
-  override suspend fun transactionInfo(@Path("hash") hash: String): Response<JsonObject>
+  @GET("api?module=proxy&action=eth_getTransactionByHash&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun transactionInfo(@Query("txhash") hash: String): Response<JsonObject>
 
-  @GET("api?module=proxy&action=eth_getTransactionCount&address={address}&tag=latest&apikey=YourApiKeyToken")
-  override suspend fun transactionCount(@Path("address") address: String): Response<JsonObject>
+  @GET("api?module=proxy&action=eth_getTransactionCount&tag=latest&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun transactionCount(@Query("address") address: String): Response<JsonObject>
 
   @FormUrlEncoded
-  @POST("api?module=proxy&action=eth_sendRawTransaction&hex={rawTransaction}&apikey=YourApiKeyToken")
-  override suspend fun sendTransaction(@Field("rawTransaction") transaction: String): Response<JsonObject>
+  @POST("api?module=proxy&action=eth_sendRawTransaction&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun sendTransaction(@Field("hex") transaction: String): Response<JsonObject>
 }

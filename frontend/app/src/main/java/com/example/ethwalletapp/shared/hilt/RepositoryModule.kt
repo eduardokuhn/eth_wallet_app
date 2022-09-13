@@ -1,5 +1,6 @@
 package com.example.ethwalletapp.shared.hilt
 
+import android.content.SharedPreferences
 import com.example.ethwalletapp.data.data_sources.IEthereumApi
 import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
 import com.example.ethwalletapp.data.repositories.AccountRepositoryImpl
@@ -27,8 +28,9 @@ object RepositoryModule {
   fun provideBalanceRepositoryImpl(
     ethereumApi: IEthereumApi,
     localAppDatabase: LocalAppDatabase,
+    sharedPreferences: SharedPreferences,
     connectivityService: IConnectivityService
   ): IBalanceRepository {
-    return BalanceRepositoryImpl(ethereumApi, localAppDatabase.balanceDao(), connectivityService)
+    return BalanceRepositoryImpl(ethereumApi, localAppDatabase.balanceDao(), sharedPreferences, connectivityService)
   }
 }

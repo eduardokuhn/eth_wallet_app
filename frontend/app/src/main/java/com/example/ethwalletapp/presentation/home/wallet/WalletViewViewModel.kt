@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.wallet
+package com.example.ethwalletapp.presentation.home.wallet
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +9,7 @@ import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import com.example.ethwalletapp.shared.utils.NetworkResult
+import com.example.ethwalletapp.shared.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,12 +36,12 @@ sealed class EthereumNetwork {
 
 data class WalletViewUIState(
   val network: EthereumNetwork = EthereumNetwork.Rinkeby,
-  val accounts: List<AccountEntry>? = null,
+  val accounts: MutableList<AccountEntry> = mutableListOf(),
   val selectedAccount: AccountEntry? = null,
-  val balances: List<BalanceEntry>? = null,
+  val balances: MutableList<BalanceEntry> = mutableListOf(),
   val selectedAccountBalance: BalanceEntry? = null,
-  val etherUsdPrice: Double? = null,
-  val hasNetworkError: Boolean = false,
+  val ethUsdPrice: Double? = null,
+  val viewState: ViewState = ViewState.Unknown
 )
 
 interface IWalletViewViewModel {
@@ -72,6 +73,7 @@ class WalletViewViewModel @Inject constructor(
     viewModelScope.launch {
       loadAccounts()
       loadBalances()
+      getEthereumLastPrice()
     }
   }
 
@@ -84,51 +86,54 @@ class WalletViewViewModel @Inject constructor(
   }
 
   override suspend fun loadAccounts() {
+    uiState.value = uiState.value.copy(viewState = ViewState.Loading)
     val accounts = accountRepository.getAllAccounts()
-    uiState.value = uiState.value.copy(
-      accounts = accounts,
-      selectedAccount = accounts.single { account -> account.addressIndex == 0 }
-    )
+
+    if (accounts.isNotEmpty()) {
+      uiState.value = uiState.value.copy(
+        accounts = accounts.toMutableList(),
+        selectedAccount = accounts.singleOrNull { account -> account.addressIndex == 0 },
+        viewState = ViewState.Success
+      )
+    } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
   }
 
   override suspend fun loadBalances() {
-    var balances: List<BalanceEntry> = listOf()
-    var hasNetworkError = false
+    uiState.value = uiState.value.copy(viewState = ViewState.Loading)
 
-    if (uiState.value.accounts != null) {
-      val addresses = uiState.value.accounts!!.map { account ->
+    if (uiState.value.accounts != null && uiState.value.accounts.isNotEmpty()) {
+      val addresses = uiState.value.accounts.map { account ->
         account.address
       }
 
-      when (val result = balanceRepository.getAddressesBalance(addresses)) {
-        is NetworkResult.Success -> balances = result.data
-        is NetworkResult.Error -> hasNetworkError = true
-        is NetworkResult.Exception -> hasNetworkError = true
-      }
+      val result = balanceRepository.getAddressesBalance(addresses)
 
-      uiState.value = uiState.value.copy(
-        balances = balances,
-        selectedAccountBalance = balances.single {
-          balance -> balance.address == uiState.value.selectedAccount.address
-        },
-        hasNetworkError = hasNetworkError
-      )
-    }
+      if (result is NetworkResult.Success) {
+        val balances = result.data
+        println("Balances: $balances")
+
+        if (balances != null && balances.isNotEmpty()) {
+          uiState.value = uiState.value.copy(
+            balances = balances.toMutableList(),
+            selectedAccountBalance = balances.singleOrNull {
+                balance -> balance.address == uiState.value.selectedAccount!!.address
+            },
+            viewState = ViewState.Success
+          )
+        }
+        else uiState.value = uiState.value.copy(viewState = ViewState.Error)
+      } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
+    } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
   }
 
   override suspend fun getEthereumLastPrice() {
-    var price = 0.0
-    var hasNetworkError = false
+    val result = balanceRepository.getPrice()
 
-    when (val result = balanceRepository.getPrice()) {
-      is NetworkResult.Success -> price = result.data
-      is NetworkResult.Error -> hasNetworkError = true
-      is NetworkResult.Exception -> hasNetworkError = true
-    }
-
-    uiState.value = uiState.value.copy(
-      etherUsdPrice = price,
-      hasNetworkError = hasNetworkError
-    )
+    if (result is NetworkResult.Success) {
+      uiState.value = uiState.value.copy(
+        ethUsdPrice = result.data,
+        viewState = ViewState.Success
+      )
+    } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
   }
 }

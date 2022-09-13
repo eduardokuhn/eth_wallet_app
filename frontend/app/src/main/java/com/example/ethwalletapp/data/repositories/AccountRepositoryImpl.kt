@@ -2,7 +2,6 @@ package com.example.ethwalletapp.data.repositories
 
 import com.example.ethwalletapp.data.data_sources.daos.AccountDao
 import com.example.ethwalletapp.data.models.AccountEntry
-import com.example.ethwalletapp.shared.theme.Gradient07
 import org.kethereum.model.Address
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,7 +28,6 @@ class AccountRepositoryImpl @Inject constructor(
     val account = AccountEntry(
       address = address,
       name = "Account $addressIndex",
-      color = Gradient07.toString(),
       addressIndex = addressIndex
     )
     accountDao.add(account)

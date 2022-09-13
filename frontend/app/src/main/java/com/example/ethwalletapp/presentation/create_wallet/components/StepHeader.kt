@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +33,7 @@ fun StepHeader(
     Text(
       text = title,
       fontSize = 16.sp,
+      fontWeight = FontWeight.SemiBold,
       modifier = Modifier
         .graphicsLayer(alpha = 0.99f)
         .drawWithCache {

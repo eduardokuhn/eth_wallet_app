@@ -13,6 +13,10 @@ val Gradient07 = listOf(
   Color(0xFF70A2FF),
   Color(0xFF54F0D1)
 )
+val Gradient08 = listOf(
+  Color(0xFF941016).copy(alpha = 0.3f),
+  Color.Transparent
+)
 
 val Primary5 = Color(0xFF3D8DFF)
 
@@ -26,5 +30,12 @@ val Gray23 = Color(0xFF101419)
 val Gray24 = Color(0xFF080A0C)
 
 val Green5 = Color(0xFF76E268)
+
+// Red
+val Red3 = Color(0xFFF5A3A7)
+val Red5 = Color(0xFFEA3943)
 val Red6 = Color(0xFFE8212B)
+val Red7 = Color(0xFFCB151E)
+val Red8 = Color(0xFF941016)
+
 val Blue5 = Color(0xFF5F97FF)

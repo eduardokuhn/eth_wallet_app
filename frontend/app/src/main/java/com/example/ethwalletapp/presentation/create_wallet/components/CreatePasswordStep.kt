@@ -114,7 +114,7 @@ fun CreatePasswordStep(
     PrimaryButton(
       onClick = createPassword,
       text = "Create Password",
-      disabled = !(uiState.isChecked && uiState.isPasswordValid),
+      disabled = !uiState.isChecked,
       modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(42.dp))

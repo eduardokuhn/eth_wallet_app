@@ -37,13 +37,13 @@ fun GhostButton(
   ) {
     Row(Modifier.padding(horizontal = 16.dp)) {
       leadingIcon?.invoke()
-      Spacer(Modifier.width(8.dp))
+      if (leadingIcon != null) Spacer(Modifier.width(8.dp))
       Text(
         text = text,
         fontSize = 16.sp,
         overflow = TextOverflow.Ellipsis
       )
-      Spacer(Modifier.width(8.dp))
+      if (trailingIcon != null) Spacer(Modifier.width(8.dp))
       trailingIcon?.invoke()
     }
   }

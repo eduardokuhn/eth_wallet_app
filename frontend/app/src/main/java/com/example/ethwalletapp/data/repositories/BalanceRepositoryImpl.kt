@@ -1,5 +1,7 @@
 package com.example.ethwalletapp.data.repositories
 
+import android.content.SharedPreferences
+import android.util.Log
 import com.example.ethwalletapp.data.data_sources.IEthereumApi
 import com.example.ethwalletapp.data.data_sources.daos.BalanceDao
 import com.example.ethwalletapp.data.models.BalanceEntry
@@ -22,6 +24,7 @@ interface IBalanceRepository {
 class BalanceRepositoryImpl @Inject constructor(
   private val ethereumApi: IEthereumApi,
   private val balanceDao: BalanceDao,
+  private val sharedPreferences: SharedPreferences,
   private val connectivityService: IConnectivityService
 ): IBalanceRepository {
   override suspend fun getPrice(): NetworkResult<Double> {
@@ -31,18 +34,21 @@ class BalanceRepositoryImpl @Inject constructor(
 
       return try {
         if (resp.isSuccessful && body != null) {
-          NetworkResult.Success(body["ethusd"].asDouble)
+          val price = body["result"].asJsonObject["ethusd"].asString
+          sharedPreferences.edit().putString("ethusd_price", price)
+          NetworkResult.Success(price.toDouble())
         } else {
           NetworkResult.Error(resp.code(), resp.message())
         }
       } catch (e: HttpException) {
         NetworkResult.Error(resp.code(), resp.message())
       } catch (e: Throwable) {
+        Log.e("BalanceRepositoryImpl.getPrice", "Exception: $e")
         NetworkResult.Exception(e)
       }
     } else {
-      // TODO get price local from shared preferences
-      return NetworkResult.Success(0.0)
+      val price = sharedPreferences.getString("ethusd_price", "0.0") ?: "0.0"
+      return NetworkResult.Success(price.toDouble())
     }
   }
 
@@ -55,8 +61,9 @@ class BalanceRepositoryImpl @Inject constructor(
         if (resp.isSuccessful && body != null) {
           val balance = BalanceEntry(
             address = address,
+            // TODO: set correct chainId
             chainId = BigInteger.valueOf(0),
-            balance = body["result"].asBigInteger,
+            balance = BigInteger(body["result"].asString),
             tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS)
           )
           balanceDao.add(balance)
@@ -81,17 +88,18 @@ class BalanceRepositoryImpl @Inject constructor(
 
       return try {
         if (resp.isSuccessful && body != null) {
-          var balances: List<BalanceEntry> = listOf()
+          val balances = mutableListOf<BalanceEntry>()
 
           body["result"].asJsonArray.forEach { json ->
             val j = json.asJsonObject
             val balance =  BalanceEntry(
               address = Address(j["account"].asString),
+              // TODO: set correct chainId
               chainId = BigInteger.valueOf(0),
-              balance = j["balance"].asBigInteger,
+              balance = BigInteger(j["balance"].asString),
               tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS)
             )
-            balances.plus(balance)
+            balances.add(balance)
             balanceDao.add(balance)
           }
           NetworkResult.Success(balances)
@@ -101,6 +109,7 @@ class BalanceRepositoryImpl @Inject constructor(
       } catch (e: HttpException) {
         NetworkResult.Error(e.code(), e.message())
       } catch (e: Throwable) {
+        Log.e("getAddressesBalance", "Exception: $e")
         NetworkResult.Exception(e)
       }
     } else {

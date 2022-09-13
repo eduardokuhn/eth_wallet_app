@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.wallet.components
+package com.example.ethwalletapp.presentation.home.wallet.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,8 +25,8 @@ fun TokenListItem(
   icon: Painter,
   name: String,
   abbr: String,
-  value: Double,
-  balance: BigInteger,
+  value: Double?,
+  balance: BigInteger?,
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -45,19 +46,21 @@ fun TokenListItem(
       Text(
         text = name,
         fontSize = 18.sp,
+        fontWeight = FontWeight.SemiBold,
         color = Color.White
       )
       Spacer(Modifier.height(8.dp))
       Text(
-        text = "$$value",
+        text = "$${value ?: "__,__"}",
         fontSize = 12.sp,
         color = Gray12
       )
     }
     Spacer(Modifier.weight(1f))
     Text(
-      text = "$balance $abbr",
+      text = "${balance ?: "__.__"} $abbr",
       fontSize = 20.sp,
+      fontWeight = FontWeight.SemiBold,
       color = Color.White
     )
   }

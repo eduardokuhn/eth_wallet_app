@@ -25,7 +25,7 @@ fun CreateWalletScreen(
   navController: NavController?,
   viewModel: ICreateAccountViewModel,
 ) {
-  val uiState = viewModel.uiState.value
+  val uiState by viewModel.uiState
 
   val pagerState = rememberPagerState()
   val scope = rememberCoroutineScope()

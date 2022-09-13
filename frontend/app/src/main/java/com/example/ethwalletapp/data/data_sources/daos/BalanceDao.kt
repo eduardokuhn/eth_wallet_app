@@ -1,9 +1,6 @@
 package com.example.ethwalletapp.data.data_sources.daos
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.ethwalletapp.data.models.BalanceEntry
 import org.kethereum.model.Address
 
@@ -15,7 +12,7 @@ interface BalanceDao {
   @Query("SELECT * FROM balance WHERE address IN (:addresses)")
   suspend fun balances(addresses: List<Address>): List<BalanceEntry>
 
-  @Insert
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun add(balance: BalanceEntry)
 
   @Update

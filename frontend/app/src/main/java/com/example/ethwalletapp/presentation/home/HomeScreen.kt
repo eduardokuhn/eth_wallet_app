@@ -14,12 +14,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ethwalletapp.presentation.settings.SettingsView
-import com.example.ethwalletapp.presentation.wallet.WalletView
-import com.example.ethwalletapp.presentation.wallet.WalletViewViewModel
+import com.example.ethwalletapp.presentation.home.wallet.WalletView
+import com.example.ethwalletapp.presentation.home.wallet.WalletViewViewModel
 import com.example.ethwalletapp.shared.theme.*
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +42,6 @@ fun HomeScreen() {
       modifier = Modifier
         .padding(padding)
         .fillMaxSize()
-        .padding(horizontal = 24.dp)
     ) {
       TabContent(views.size, pagerState, Modifier.weight(1f))
       TabBar(pagerState, scope, views)
