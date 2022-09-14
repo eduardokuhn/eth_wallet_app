@@ -8,6 +8,7 @@ import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
+import com.example.ethwalletapp.data.services.IAccountService
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import com.example.ethwalletapp.shared.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,13 +36,17 @@ sealed class EthereumNetwork {
 }
 
 data class WalletViewUIState(
+  // WalletView
   val network: EthereumNetwork = EthereumNetwork.Rinkeby,
   val accounts: MutableList<AccountEntry> = mutableListOf(),
   val selectedAccount: AccountEntry? = null,
   val balances: MutableList<BalanceEntry> = mutableListOf(),
   val selectedAccountBalance: BalanceEntry? = null,
   val ethUsdPrice: Double? = null,
-  val viewState: ViewState = ViewState.Unknown
+  val viewState: ViewState = ViewState.Unknown,
+  // CreateAccountBottomSheetContentView
+  val newAccountName: String = "",
+  val createNewAccountHasError: Boolean = false
 )
 
 interface IWalletViewViewModel {
@@ -51,6 +56,8 @@ interface IWalletViewViewModel {
   suspend fun loadAccounts()
   suspend fun loadBalances()
   suspend fun getEthereumLastPrice()
+  fun setNewAccountName(value: String)
+  suspend fun createNewAccount(): Boolean
 }
 
 class WalletViewViewModelMock : IWalletViewViewModel {
@@ -60,10 +67,13 @@ class WalletViewViewModelMock : IWalletViewViewModel {
   override suspend fun loadAccounts() {}
   override suspend fun loadBalances() {}
   override suspend fun getEthereumLastPrice() {}
+  override fun setNewAccountName(value: String) {}
+  override suspend fun createNewAccount(): Boolean { return true }
 }
 
 @HiltViewModel
 class WalletViewViewModel @Inject constructor(
+  private val accountService: IAccountService,
   private val accountRepository: IAccountRepository,
   private val balanceRepository: IBalanceRepository
 ) : ViewModel(), IWalletViewViewModel {
@@ -135,5 +145,23 @@ class WalletViewViewModel @Inject constructor(
         viewState = ViewState.Success
       )
     } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
+  }
+
+  override fun setNewAccountName(value: String) { uiState.value = uiState.value.copy(newAccountName = value) }
+
+  override suspend fun createNewAccount(): Boolean {
+    val createdAccount = accountService.createChildAccount()
+
+    return if (createdAccount != null) {
+      uiState.value = uiState.value.copy(
+        accounts = uiState.value.accounts.plus(createdAccount).toMutableList(),
+        newAccountName = "",
+        createNewAccountHasError = false
+      )
+      true
+    } else {
+      uiState.value = uiState.value.copy(createNewAccountHasError = true)
+      false
+    }
   }
 }

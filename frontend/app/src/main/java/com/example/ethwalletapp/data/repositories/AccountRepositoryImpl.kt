@@ -10,7 +10,7 @@ interface IAccountRepository {
   suspend fun getAddressIndex(): Int
   suspend fun getAllAccounts(): List<AccountEntry>
   suspend fun getAccountCount(): Int
-  suspend fun saveAccount(address: Address, addressIndex: Int)
+  suspend fun saveAccount(address: Address, addressIndex: Int): AccountEntry
   suspend fun updateAccount(editedAccount: AccountEntry)
 }
 
@@ -24,13 +24,14 @@ class AccountRepositoryImpl @Inject constructor(
 
   override suspend fun getAccountCount(): Int { return accountDao.count() }
 
-  override suspend fun saveAccount(address: Address, addressIndex: Int) {
+  override suspend fun saveAccount(address: Address, addressIndex: Int): AccountEntry {
     val account = AccountEntry(
       address = address,
       name = "Account $addressIndex",
       addressIndex = addressIndex
     )
     accountDao.add(account)
+    return account
   }
 
   override suspend fun updateAccount(editedAccount: AccountEntry) { accountDao.update(editedAccount) }

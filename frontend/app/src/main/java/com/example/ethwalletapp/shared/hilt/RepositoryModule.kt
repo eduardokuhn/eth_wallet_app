@@ -12,6 +12,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -28,6 +29,7 @@ object RepositoryModule {
   fun provideBalanceRepositoryImpl(
     ethereumApi: IEthereumApi,
     localAppDatabase: LocalAppDatabase,
+    @Named("sharedPreferences")
     sharedPreferences: SharedPreferences,
     connectivityService: IConnectivityService
   ): IBalanceRepository {

@@ -1,13 +1,15 @@
 package com.example.ethwalletapp.presentation.home.wallet
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.ChangeCircle
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -24,10 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.R
+import com.example.ethwalletapp.presentation.home.wallet.components.AccountBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.TokenListItem
 import com.example.ethwalletapp.shared.components.ErrorBanner
 import com.example.ethwalletapp.shared.components.SecondaryButton
-import com.example.ethwalletapp.shared.theme.*
+import com.example.ethwalletapp.shared.theme.Gradient07
+import com.example.ethwalletapp.shared.theme.Gray24
+import com.example.ethwalletapp.shared.theme.Green5
+import com.example.ethwalletapp.shared.theme.Primary5
 import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import com.example.ethwalletapp.shared.utils.ViewState
 import kotlinx.coroutines.launch
@@ -35,21 +41,39 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WalletView(
-  viewModel: IWalletViewViewModel
+  viewModel: IWalletViewViewModel,
+  setShowTabBar: (value: Boolean) -> Unit
 ) {
+  val uiState = viewModel.uiState.value
   val sheetState = rememberModalBottomSheetState(
     initialValue = ModalBottomSheetValue.Hidden,
-    confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
+    confirmStateChange = {
+      setShowTabBar(it == ModalBottomSheetValue.Hidden)
+      it != ModalBottomSheetValue.HalfExpanded
+    }
   )
   val scope = rememberCoroutineScope()
 
-  BackHandler(sheetState.isVisible) {
-    scope.launch { sheetState.hide() }
-  }
-
   ModalBottomSheetLayout(
     sheetState = sheetState,
-    sheetContent = {},
+    sheetContent = {
+      AccountBottomSheetContent(
+        accounts = uiState.accounts,
+        setSelectedAccount = viewModel::setSelectedAccount,
+        balances = uiState.balances,
+        newAccountName = uiState.newAccountName,
+        setNewAccountName = viewModel::setNewAccountName,
+        createNewAccount = {
+          scope.launch {
+            val ok = viewModel.createNewAccount()
+            if (ok) sheetState.hide()
+          }
+        },
+        createNewAccountHasError = uiState.createNewAccountHasError,
+        importAccount = { /*TODO*/ },
+      )
+    },
+    sheetBackgroundColor = Gray24,
     modifier = Modifier.fillMaxSize()
   ) {
     Column(
@@ -57,8 +81,6 @@ fun WalletView(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxSize()
     ) {
-      val uiState = viewModel.uiState.value
-
       if (uiState.viewState != ViewState.Loading) {
         if (uiState.viewState == ViewState.Error) {
           ErrorBanner(
@@ -77,15 +99,25 @@ fun WalletView(
           Box(Modifier.fillMaxWidth()) {
             Box(
               modifier = Modifier
-                .clickable { /*TODO*/ }
+                .clickable {
+                  scope.launch {
+                    if (sheetState.isVisible) {
+                      sheetState.hide()
+                      setShowTabBar(true)
+                    } else {
+                      setShowTabBar(false)
+                      sheetState.show()
+                    }
+                  }
+                }
                 .size(36.dp)
                 .align(Alignment.CenterStart)
                 .background(Green5, CircleShape)
             ) {
               Text(
                 text =
-                if (uiState.selectedAccount != null) (uiState.selectedAccount.addressIndex + 1).toString()
-                else "?",
+                  if (uiState.selectedAccount != null) (uiState.selectedAccount.addressIndex + 1).toString()
+                  else "?",
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center)
@@ -200,5 +232,6 @@ fun WalletView(
 @Preview
 @Composable
 private fun WalletViewPreview() {
-  WalletView(WalletViewViewModelMock())
+  fun setShowTabBar(value: Boolean) {}
+  WalletView(WalletViewViewModelMock(), ::setShowTabBar)
 }

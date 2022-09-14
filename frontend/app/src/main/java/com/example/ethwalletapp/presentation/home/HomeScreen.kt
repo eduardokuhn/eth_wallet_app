@@ -6,7 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
@@ -31,6 +34,7 @@ fun HomeScreen() {
     backgroundColor = Gray24
   ) { padding ->
     val pagerState = rememberPagerState()
+    var showTabBar = rememberSaveable { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
 
     val views = listOf(
@@ -38,13 +42,19 @@ fun HomeScreen() {
       "Settings" to Icons.Outlined.Settings
     )
 
+    fun setShowTabBar(value: Boolean) { showTabBar.value = value }
+
     Column(
       modifier = Modifier
         .padding(padding)
         .fillMaxSize()
     ) {
-      TabContent(views.size, pagerState, Modifier.weight(1f))
-      TabBar(pagerState, scope, views)
+      TabContent(
+        viewCount = views.size,
+        pagerState = pagerState,
+        setShowTabBar = ::setShowTabBar
+      )
+      if (showTabBar.value) TabBar(pagerState, scope, views)
     }
   }
 }
@@ -57,16 +67,20 @@ private fun HomeScreenPreview() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun TabContent(viewCount: Int, pagerState: PagerState, modifier: Modifier) {
+private fun ColumnScope.TabContent(
+  viewCount: Int,
+  pagerState: PagerState,
+  setShowTabBar: (value: Boolean) -> Unit
+) {
   HorizontalPager(
     count = viewCount,
     state = pagerState,
-    modifier = modifier
+    modifier = Modifier.weight(1f)
   ) { page ->
     when (page) {
       0 -> {
         val viewModel: WalletViewViewModel = hiltViewModel()
-        WalletView(viewModel)
+        WalletView(viewModel, setShowTabBar)
       }
       1 -> SettingsView()
     }

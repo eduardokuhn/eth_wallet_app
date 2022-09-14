@@ -1,6 +1,7 @@
 package com.example.ethwalletapp.shared.hilt
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.services.AccountServiceImpl
 import com.example.ethwalletapp.data.services.ConnectivityServiceImpl
@@ -12,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.kethereum.keystore.api.KeyStore
+import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -19,9 +21,11 @@ object ServiceModule {
   @Provides
   fun provideAccountServiceImpl(
     keyStore: KeyStore,
+    @Named("encryptedSharedPreferences")
+    encryptedSharedPreferences: SharedPreferences,
     accountRepository: IAccountRepository
   ) : IAccountService {
-    return AccountServiceImpl(keyStore, accountRepository)
+    return AccountServiceImpl(keyStore, encryptedSharedPreferences, accountRepository)
   }
 
   @Provides
