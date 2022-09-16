@@ -39,3 +39,11 @@ val Red7 = Color(0xFFCB151E)
 val Red8 = Color(0xFF941016)
 
 val Blue5 = Color(0xFF5F97FF)
+
+// Yellow
+val Yellow4 = Color(0xFFFFE243)
+val Yellow5 = Color(0xFFFFD505)
+
+val Turquoise5 = Color(0xFF45F0D1)
+
+val Pink = Color(0xFFFF56A9)

@@ -5,12 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,15 +26,15 @@ import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.utils.Constant
 import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
-import kotlinx.coroutines.launch
 import org.kethereum.model.Address
 import java.math.BigInteger
 
 @Composable
 fun DefaultAccountBottomSheetContentView(
   accounts: List<AccountEntry>?,
-  setSelectedAccount: (account: AccountEntry) -> Unit,
   balances: List<BalanceEntry>?,
+  onSelect: (account: AccountEntry, BalanceEntry?) -> Unit,
+  isAccountSelected: (account: AccountEntry) -> Boolean,
   onCreateNewAccount: () -> Unit,
   onImportAccount: () -> Unit
 ) {
@@ -42,6 +42,7 @@ fun DefaultAccountBottomSheetContentView(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier.padding(horizontal = 24.dp)
   ) {
+    Spacer(Modifier.height(16.dp))
     Box(Modifier.fillMaxWidth()) {
       Text(
         text = "Account",
@@ -51,22 +52,24 @@ fun DefaultAccountBottomSheetContentView(
         modifier = Modifier.align(Alignment.Center)
       )
     }
-    if (accounts != null && accounts.isNotEmpty()) {
-      LazyColumn {
-        items(accounts) { account ->
-          Spacer(Modifier.height(36.dp))
+    Spacer(Modifier.height(50.dp))
+    LazyColumn(Modifier.weight(1f)) {
+      if (accounts != null && accounts.isNotEmpty()) {
+        itemsIndexed(accounts) { index, account ->
           AccountListItem(
             account = account,
-            setSelectedAccount = setSelectedAccount,
-            balance = balances?.singleOrNull { balance -> balance.address == account.address }
+            onSelect = onSelect,
+            balance = balances?.firstOrNull { balance -> balance.address == account.address },
+            isAccountSelected = isAccountSelected
           )
+          if (index < accounts.lastIndex) Spacer(Modifier.height(36.dp))
         }
       }
     }
     Spacer(Modifier.height(36.dp))
     AppTextButton(onClick = onCreateNewAccount, text = "Create New Account")
     AppTextButton(onClick = onImportAccount, text = "Import Account")
-
+    Spacer(Modifier.height(42.dp))
   }
 }
 
@@ -143,19 +146,27 @@ private fun DefaultAccountBottomSheetContentViewPreview() {
       balance = BigInteger.valueOf(0)
     )
   )
-  DefaultAccountBottomSheetContentView(accounts, {}, balances, {}, {})
+  DefaultAccountBottomSheetContentView(
+    accounts,
+    balances,
+    { account, balance -> print("$account $balance") },
+    { true },
+    {},
+    {}
+  )
 }
 
 @Composable
 fun AccountListItem(
   account: AccountEntry,
-  setSelectedAccount: (account: AccountEntry) -> Unit,
-  balance: BalanceEntry?
+  onSelect: (account: AccountEntry, balance: BalanceEntry?) -> Unit,
+  balance: BalanceEntry?,
+  isAccountSelected: (account: AccountEntry) -> Boolean
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier
-      .clickable { setSelectedAccount(account) }
+      .clickable { onSelect(account, balance) }
       .fillMaxWidth()
   ) {
     Box(
@@ -164,14 +175,14 @@ fun AccountListItem(
         .background(Green5, CircleShape)
     ) {
       Text(
-        text = (account.addressIndex + 1).toString(),
+        text = "${account.addressIndex + 1}",
         fontSize = 18.sp,
         color = Color.White,
         modifier = Modifier.align(Alignment.Center)
       )
     }
     Spacer(Modifier.width(10.dp))
-    Column() {
+    Column(Modifier.weight(1f)) {
       Text(
         text = account.name,
         fontSize = 18.sp,
@@ -181,10 +192,17 @@ fun AccountListItem(
       Spacer(Modifier.height(6.dp))
       Text(
         text =
-        if (balance != null) "${EthereumUnitConverter.weiToEther(balance.balance)} ETH"
-        else "__.__ ETH",
+          if (balance != null) "${EthereumUnitConverter.weiToEther(balance.balance)} ETH"
+          else "__.__ ETH",
         fontSize = 12.sp,
         color = Gray12
+      )
+    }
+    if (isAccountSelected(account)) {
+      Icon(
+        Icons.Outlined.Check,
+        contentDescription = "Account is selected",
+        tint = Green5
       )
     }
   }
@@ -199,12 +217,13 @@ private fun AccountListItemPreview() {
       name = "Account 1",
       addressIndex = 0
     ),
-    setSelectedAccount = {},
+    onSelect = { account, balance -> print("$account $balance") },
     balance = BalanceEntry(
       address = Address("0x71C7656EC7ab88b098defB751B7401B5f6d8976F"),
       tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS),
       chainId = BigInteger.valueOf(0),
       balance = BigInteger.valueOf(1600),
-    )
+    ),
+    isAccountSelected = { true }
   )
 }

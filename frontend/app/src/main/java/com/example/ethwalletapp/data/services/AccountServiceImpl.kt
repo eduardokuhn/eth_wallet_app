@@ -3,6 +3,7 @@ package com.example.ethwalletapp.data.services
 import android.content.SharedPreferences
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
+import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import org.kethereum.DEFAULT_ETHEREUM_BIP44_PATH
 import org.kethereum.bip32.model.ExtendedKey
 import org.kethereum.bip39.dirtyPhraseToMnemonicWords
@@ -12,8 +13,13 @@ import org.kethereum.bip39.toKey
 import org.kethereum.bip39.validate
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
 import org.kethereum.crypto.toAddress
+import org.kethereum.crypto.toECKeyPair
+import org.kethereum.eip191.signWithEIP191PersonalSign
 import org.kethereum.keystore.api.KeyStore
 import org.kethereum.model.ECKeyPair
+import org.kethereum.model.PrivateKey
+import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.model.HexString
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -32,9 +38,10 @@ interface IAccountService {
   fun generateSecretRecoveryPhrase(): String
   fun validateSecretRecoveryPhrase(secretRecoveryPhrase: String): Boolean
   suspend fun createMasterAccount(secretRecoveryPhrase: String, password: String)
-  suspend fun createChildAccount(): AccountEntry?
+  suspend fun createChildAccount(name: String?): AccountEntry?
   suspend fun importMasterAccount(secretRecoveryPhrase: String, password: String)
-  suspend fun importChildAccount(secretRecoveryPhrase: String, password: String)
+  suspend fun importChildAccount(): AccountEntry?
+  suspend fun importExternAccount(privateKey: String): AccountEntry?
   suspend fun hasAccount(): Boolean
 }
 
@@ -57,6 +64,13 @@ class AccountServiceImpl @Inject constructor(
     return mnemonicWords.validate(WORDLIST_ENGLISH)
   }
 
+  private fun ECKeyPair.isValid() = try {
+    signWithEIP191PersonalSign("test".toByteArray())
+    true
+  } catch (e:java.lang.Exception) {
+    false
+  }
+
   override suspend fun createMasterAccount(secretRecoveryPhrase: String, password: String) {
     val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
     // Generate the master key (512bit long key) from seed of the mnemonic phrase
@@ -67,24 +81,36 @@ class AccountServiceImpl @Inject constructor(
       .putString("srp", secretRecoveryPhrase)
       .putString("password", password)
       .apply()
-    accountRepository.saveAccount(keyPair.toAddress(), 0)
+    accountRepository.saveAccount(
+      AccountEntry(
+        address = keyPair.toAddress(),
+        name = "Account 1",
+        addressIndex = 0
+      )
+    )
   }
 
-  override suspend fun createChildAccount(): AccountEntry? {
+  override suspend fun createChildAccount(name: String?): AccountEntry? {
     // From the mnemonic phrase the master key can be created
     val secretRecoveryPhrase = encryptedSharedPreferences.getString("srp", "") ?: ""
     val password = encryptedSharedPreferences.getString("password", "") ?: ""
 
     return if (secretRecoveryPhrase.isNotEmpty() && password.isNotEmpty()) {
       val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
-      val addressIndex: Int = accountRepository.getAddressIndex()
+      val addressIndex: Int = accountRepository.getLatestAddressIndex() + 1
       var path: String = DEFAULT_ETHEREUM_BIP44_PATH
       // Increase the address_index (m/44'/60'/0'/0/address_index)
-      path = path.substring(0, 15) + addressIndex.toString()
+      path = path.substring(0, 15) + (addressIndex).toString()
       // Generate the child key from the mnemonic phrase and updated path
       val keyPair: ECKeyPair = mnemonicWords.toKey(path, saltPhrase).keyPair
       keyStore.addKey(keyPair, password, true)
-      accountRepository.saveAccount(keyPair.toAddress(), addressIndex)
+      accountRepository.saveAccount(
+        AccountEntry(
+          address = keyPair.toAddress(),
+          name = name ?: "Account ${addressIndex + 1}",
+          addressIndex = addressIndex
+        )
+      )
     } else null
   }
 
@@ -96,11 +122,42 @@ class AccountServiceImpl @Inject constructor(
       .putString("srp", secretRecoveryPhrase)
       .putString("password", password)
       .apply()
-    accountRepository.saveAccount(keyPair.toAddress(), 0)
+    accountRepository.saveAccount(
+      AccountEntry(
+        address = keyPair.toAddress(),
+        name = "Account 0",
+        addressIndex = 0
+      )
+    )
+  }
+
+  override suspend fun importChildAccount(): AccountEntry? {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun importExternAccount(privateKey: String): AccountEntry? {
+    try {
+      val importedKey = PrivateKey(HexString(privateKey).hexToByteArray()).toECKeyPair()
+      return if (importedKey.isValid()) {
+        println("Private key: ${importedKey.privateKey}")
+        val password = encryptedSharedPreferences.getString("password", "") ?: ""
+        val addressIndex: Int = accountRepository.getLatestAddressIndex() + 1
+        keyStore.addKey(importedKey, password, light = true)
+        return accountRepository.saveAccount(
+          AccountEntry(
+            address = importedKey.toAddress(),
+            name = "Imported account ${addressIndex + 1}",
+            addressIndex= addressIndex
+          )
+        )
+      } else null
+    } catch (e: IllegalArgumentException) {
+      return null
+    }
   }
 
   // TODO do
-  override suspend fun importChildAccount(secretRecoveryPhrase: String, password: String) {
+  suspend fun importChildAccount(secretRecoveryPhrase: String, password: String) {
     repeat(9) { addressIndex ->
       val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
       var path: String = DEFAULT_ETHEREUM_BIP44_PATH

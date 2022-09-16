@@ -17,13 +17,18 @@ import java.math.BigInteger
 @Composable
 fun AccountBottomSheetContent(
   accounts: List<AccountEntry>?,
-  setSelectedAccount: (account: AccountEntry) -> Unit,
   balances: List<BalanceEntry>?,
+  selectAccount: (account: AccountEntry, BalanceEntry?) -> Unit,
+  isAccountSelected: (account: AccountEntry) -> Boolean,
   newAccountName: String,
   setNewAccountName: (value: String) -> Unit,
-  createNewAccount: () -> Unit,
+  createNewAccount: () -> Boolean,
   createNewAccountHasError: Boolean,
-  importAccount: () -> Unit
+  importAccountPrivateKey: String,
+  setImportAccountPrivateKey: (value: String) -> Unit,
+  isImportAccountPrivateKeyValid: Boolean,
+  importAccount: () -> Boolean,
+  importAccountHasError: Boolean
 ) {
   val pagerState = rememberPagerState()
   val scope = rememberCoroutineScope()
@@ -36,8 +41,9 @@ fun AccountBottomSheetContent(
     when (page) {
       0 -> DefaultAccountBottomSheetContentView(
         accounts = accounts,
-        setSelectedAccount = setSelectedAccount,
         balances = balances,
+        onSelect = selectAccount,
+        isAccountSelected = isAccountSelected,
         onCreateNewAccount = { scope.launch { pagerState.animateScrollToPage(1) } },
         onImportAccount = { scope.launch { pagerState.animateScrollToPage(2) } }
       )
@@ -45,10 +51,23 @@ fun AccountBottomSheetContent(
         onBack = { scope.launch{ pagerState.animateScrollToPage(0) } },
         newAccountName = newAccountName,
         setNewAccountName = setNewAccountName,
-        onCreate = createNewAccount,
+        onCreate = {
+          val ok = createNewAccount()
+          if (ok) scope.launch { pagerState.scrollToPage(0) }
+       },
         onCreateHasError = createNewAccountHasError
       )
-      2 -> ImportAccountBottomSheetContentView()
+      2 -> ImportAccountBottomSheetContentView(
+        onBack = { scope.launch { pagerState.animateScrollToPage(0) } },
+        importAccountPrivateKey = importAccountPrivateKey,
+        setImportAccountPrivateKey = setImportAccountPrivateKey,
+        isImportAccountPrivateKeyValid = isImportAccountPrivateKeyValid,
+        onImport = {
+          val ok = importAccount()
+          if (ok) scope.launch { pagerState.scrollToPage(0) }
+        },
+        onImportHasError = importAccountHasError
+      )
     }
   }
 }
@@ -128,12 +147,17 @@ private fun AccountBottomSheetContentPreview() {
   )
   AccountBottomSheetContent(
     accounts = accounts,
-    setSelectedAccount = {},
     balances = balances,
+    selectAccount = { account, balance -> print("$account $balance") },
+    isAccountSelected = {true},
     newAccountName = "",
     setNewAccountName = {},
-    createNewAccount = {},
+    createNewAccount = {true},
     createNewAccountHasError = false,
-    importAccount = {}
+    importAccountPrivateKey = "",
+    setImportAccountPrivateKey = {},
+    isImportAccountPrivateKeyValid = true,
+    importAccount = {true},
+    importAccountHasError = false
   )
 }

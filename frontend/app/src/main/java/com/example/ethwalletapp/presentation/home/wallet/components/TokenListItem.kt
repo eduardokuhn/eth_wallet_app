@@ -51,7 +51,9 @@ fun TokenListItem(
       )
       Spacer(Modifier.height(8.dp))
       Text(
-        text = "$${value ?: "__,__"}",
+        text =
+          "$" + if (value != null && balance != null) "${value * balance.toDouble()}"
+          else "__,__",
         fontSize = 12.sp,
         color = Gray12
       )

@@ -1,6 +1,5 @@
 package com.example.ethwalletapp.shared.components
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -10,8 +9,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,7 +25,8 @@ fun SecondaryButton(
   text: String,
   leadingIcon: @Composable (() -> Unit)? = null,
   trailingIcon: @Composable (() -> Unit)? = null,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  textModifier: Modifier = Modifier
 ) {
   Button(
     onClick = onClick,
@@ -34,13 +36,19 @@ fun SecondaryButton(
     modifier = modifier
       .height(56.dp)
   ) {
-    Row(Modifier.padding(horizontal = 16.dp)) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
       leadingIcon?.invoke()
       if (leadingIcon != null) Spacer(Modifier.width(8.dp))
       Text(
         text = text,
         fontSize = 16.sp,
         color = Color.White,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        modifier = textModifier
       )
       if (trailingIcon != null) Spacer(Modifier.width(8.dp))
       trailingIcon?.invoke()
@@ -53,8 +61,8 @@ fun SecondaryButton(
 fun SecondaryButtonPreview() {
   SecondaryButton(
     onClick = {},
-    text = "Enter",
-    leadingIcon = {
+    text = "fedc65ce5964684df2eb0b4140ef0ca898b84e3fff635c1575dd991e2d1bd90b",
+    trailingIcon = {
       Icon(
         Icons.Outlined.VisibilityOff,
         contentDescription = "Show secret recovery phrase",

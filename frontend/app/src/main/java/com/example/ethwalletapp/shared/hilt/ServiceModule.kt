@@ -3,10 +3,8 @@ package com.example.ethwalletapp.shared.hilt
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.ethwalletapp.data.repositories.IAccountRepository
-import com.example.ethwalletapp.data.services.AccountServiceImpl
-import com.example.ethwalletapp.data.services.ConnectivityServiceImpl
-import com.example.ethwalletapp.data.services.IAccountService
-import com.example.ethwalletapp.data.services.IConnectivityService
+import com.example.ethwalletapp.data.services.*
+import com.example.ethwalletapp.shared.network.HostSelectionInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,5 +29,10 @@ object ServiceModule {
   @Provides
   fun provideConnectivityServiceImpl(@ApplicationContext context: Context): IConnectivityService {
     return ConnectivityServiceImpl(context)
+  }
+
+  @Provides
+  fun provideEtherscanNetworkServiceImpl(hostSelectionInterceptor: HostSelectionInterceptor): IEthereumNetworkService {
+    return EtherscanNetworkServiceImpl(hostSelectionInterceptor)
   }
 }

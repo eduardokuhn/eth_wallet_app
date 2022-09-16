@@ -8,6 +8,7 @@ import com.example.ethwalletapp.data.repositories.BalanceRepositoryImpl
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import com.example.ethwalletapp.data.services.IConnectivityService
+import com.example.ethwalletapp.data.services.IEthereumNetworkService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,12 +28,19 @@ object RepositoryModule {
   @Singleton
   @Provides
   fun provideBalanceRepositoryImpl(
+    ethereumNetworkService: IEthereumNetworkService,
     ethereumApi: IEthereumApi,
     localAppDatabase: LocalAppDatabase,
     @Named("sharedPreferences")
     sharedPreferences: SharedPreferences,
     connectivityService: IConnectivityService
   ): IBalanceRepository {
-    return BalanceRepositoryImpl(ethereumApi, localAppDatabase.balanceDao(), sharedPreferences, connectivityService)
+    return BalanceRepositoryImpl(
+      ethereumNetworkService = ethereumNetworkService,
+      ethereumApi = ethereumApi,
+      balanceDao = localAppDatabase.balanceDao(),
+      sharedPreferences = sharedPreferences,
+      connectivityService = connectivityService
+    )
   }
 }

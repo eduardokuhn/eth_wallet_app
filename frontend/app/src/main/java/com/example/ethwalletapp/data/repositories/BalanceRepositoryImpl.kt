@@ -6,6 +6,7 @@ import com.example.ethwalletapp.data.data_sources.IEthereumApi
 import com.example.ethwalletapp.data.data_sources.daos.BalanceDao
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.services.IConnectivityService
+import com.example.ethwalletapp.data.services.IEthereumNetworkService
 import com.example.ethwalletapp.shared.utils.Constant
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import org.kethereum.model.Address
@@ -18,10 +19,12 @@ interface IBalanceRepository {
   suspend fun getPrice(): NetworkResult<Double>
   suspend fun getAddressBalance(address: Address): NetworkResult<BalanceEntry>
   suspend fun getAddressesBalance(addresses: List<Address>): NetworkResult<List<BalanceEntry>>
+  suspend fun createAddressBalance(address: Address): BalanceEntry
 }
 
 @Singleton
 class BalanceRepositoryImpl @Inject constructor(
+  private val ethereumNetworkService: IEthereumNetworkService,
   private val ethereumApi: IEthereumApi,
   private val balanceDao: BalanceDao,
   private val sharedPreferences: SharedPreferences,
@@ -61,8 +64,7 @@ class BalanceRepositoryImpl @Inject constructor(
         if (resp.isSuccessful && body != null) {
           val balance = BalanceEntry(
             address = address,
-            // TODO: set correct chainId
-            chainId = BigInteger.valueOf(0),
+            chainId = ethereumNetworkService.selectedNetwork.chainId(),
             balance = BigInteger(body["result"].asString),
             tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS)
           )
@@ -94,8 +96,7 @@ class BalanceRepositoryImpl @Inject constructor(
             val j = json.asJsonObject
             val balance =  BalanceEntry(
               address = Address(j["account"].asString),
-              // TODO: set correct chainId
-              chainId = BigInteger.valueOf(0),
+              chainId = ethereumNetworkService.selectedNetwork.chainId(),
               balance = BigInteger(j["balance"].asString),
               tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS)
             )
@@ -115,5 +116,16 @@ class BalanceRepositoryImpl @Inject constructor(
     } else {
       return NetworkResult.Success(balanceDao.balances(addresses))
     }
+  }
+
+  override suspend fun createAddressBalance(address: Address): BalanceEntry {
+    val balance = BalanceEntry(
+      address = address,
+      tokenAddress = Address(Constant.ETHEREUM_TOKEN_ADDRESS),
+      chainId = ethereumNetworkService.selectedNetwork.chainId(),
+      balance = BigInteger.valueOf(0)
+    )
+    balanceDao.add(balance)
+    return balance
   }
 }

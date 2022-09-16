@@ -9,7 +9,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.shared.components.ErrorBanner
-import kotlinx.coroutines.launch
 
 @Composable
 fun CreateAccountBottomSheetContentView(
@@ -28,8 +26,6 @@ fun CreateAccountBottomSheetContentView(
   onCreate: () -> Unit,
   onCreateHasError: Boolean
 ) {
-  val scope = rememberCoroutineScope()
-
   Column {
     if (onCreateHasError) {
       ErrorBanner(
@@ -37,39 +33,43 @@ fun CreateAccountBottomSheetContentView(
         description = "Error creating new account"
       )
     }
-
+    Spacer(Modifier.height(6.dp))
+    Box(
+      modifier = Modifier
+        .padding(horizontal = 10.dp)
+        .fillMaxWidth()
+    ) {
+      IconButton(
+        onClick = onBack,
+        modifier = Modifier.align(Alignment.CenterStart)
+      ) {
+        Icon(
+          Icons.Filled.ArrowBack,
+          contentDescription = "Back to account",
+          tint = Color.White
+        )
+      }
+      Text(
+        text = "Create New Account",
+        fontSize = 18.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = Color.White,
+        modifier = Modifier.align(Alignment.Center)
+      )
+    }
+    Spacer(Modifier.height(40.dp))
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.padding(horizontal = 24.dp)
     ) {
-      Box(Modifier.fillMaxWidth()) {
-        IconButton(
-          onClick = onBack,
-          modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-          Icon(
-            Icons.Filled.ArrowBack,
-            contentDescription = "Back to account",
-            tint = Color.White
-          )
-        }
-        Text(
-          text = "Create New Account",
-          fontSize = 18.sp,
-          fontWeight = FontWeight.SemiBold,
-          color = Color.White,
-          modifier = Modifier.align(Alignment.Center)
-        )
-      }
-      Spacer(Modifier.height(36.dp))
       TextInput(
         value = newAccountName,
         onValueChange = setNewAccountName,
         label = "Account Name"
       )
-      Spacer(Modifier.height(80.dp))
+      Spacer(Modifier.weight(1f).height(80.dp))
       PrimaryButton(
-        onClick = { scope.launch{ onCreate() } },
+        onClick = onCreate,
         text = "Create"
       )
       Spacer(Modifier.height(42.dp))
@@ -85,6 +85,6 @@ private fun CreateAccountBottomSheetContentViewPreview() {
     onCreate = {},
     newAccountName = "",
     setNewAccountName = {},
-    onCreateHasError = true
+    onCreateHasError = false
   )
 }
