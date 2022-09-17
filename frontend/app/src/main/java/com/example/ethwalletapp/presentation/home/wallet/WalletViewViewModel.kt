@@ -27,14 +27,17 @@ data class WalletViewUIState(
   val ethUsdPrice: Double? = null,
   val viewState: ViewState = ViewState.Unknown,
   // WalletView - END
-  // CreateAccountBottomSheetContentView - START
+
+  // CreateAccountBottomSheetContentView - STAR
   val newAccountName: String = "",
   val createNewAccountHasError: Boolean = false,
   // CreateAccountBottomSheetContentView - END
+
   // ImportAccountBottomSheetContentView - START
   val importAccountPrivateKey: String = "",
   val isImportAccountPrivateKeyValid: Boolean = true,
   val importAccountHasError: Boolean = false
+  // ImportAccountBottomSheetContentView - END
 )
 
 interface IWalletViewViewModel {

@@ -7,7 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +44,7 @@ fun CreateAccountBottomSheetContentView(
         modifier = Modifier.align(Alignment.CenterStart)
       ) {
         Icon(
-          Icons.Filled.ArrowBack,
+          Icons.Outlined.KeyboardArrowLeft,
           contentDescription = "Back to account",
           tint = Color.White
         )

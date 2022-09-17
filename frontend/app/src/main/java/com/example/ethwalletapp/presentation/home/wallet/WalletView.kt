@@ -41,10 +41,10 @@ import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import com.example.ethwalletapp.shared.utils.ViewState
 import kotlinx.coroutines.launch
 
-sealed class WalletViewBottomSheetView() {
-  object AccountBottomSheet: WalletViewBottomSheetView()
-  object NetworkBottomSheet: WalletViewBottomSheetView()
-  object ReceivePaymentBottomSheet: WalletViewBottomSheetView()
+sealed class WalletViewBottomSheetContent() {
+  object AccountBottomSheet: WalletViewBottomSheetContent()
+  object NetworkBottomSheet: WalletViewBottomSheetContent()
+  object ReceivePaymentBottomSheet: WalletViewBottomSheetContent()
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -54,14 +54,14 @@ fun WalletView(
   setShowTabBar: (value: Boolean) -> Unit
 ) {
   val uiState = viewModel.uiState.value
-  var currentBottomSheetView: WalletViewBottomSheetView? by remember {
+  var currentBottomSheetContent: WalletViewBottomSheetContent? by remember {
     mutableStateOf(null)
   }
   val sheetState = rememberModalBottomSheetState(
     initialValue = ModalBottomSheetValue.Hidden,
     confirmStateChange = {
       setShowTabBar(it == ModalBottomSheetValue.Hidden)
-      if (it == ModalBottomSheetValue.Hidden) currentBottomSheetView = null
+      if (it == ModalBottomSheetValue.Hidden) currentBottomSheetContent = null
       it != ModalBottomSheetValue.HalfExpanded
     }
   )
@@ -69,15 +69,15 @@ fun WalletView(
 
   val clipboardManager = LocalClipboardManager.current
 
-  fun openSheet(view: WalletViewBottomSheetView) {
-    currentBottomSheetView = view
+  fun openSheet(content: WalletViewBottomSheetContent) {
+    currentBottomSheetContent = content
     setShowTabBar(false)
     scope.launch { sheetState.show() }
   }
 
   fun closeSheet() {
     scope.launch { sheetState.hide() }
-    currentBottomSheetView = null
+    currentBottomSheetContent = null
     setShowTabBar(true)
   }
 
@@ -89,9 +89,9 @@ fun WalletView(
       sheetContent = {
         // To prevent crash
         Spacer(modifier = Modifier.height(1.dp))
-        currentBottomSheetView?.let { currentSheet ->
+        currentBottomSheetContent?.let { currentSheet ->
           when (currentSheet) {
-            WalletViewBottomSheetView.AccountBottomSheet -> AccountBottomSheetContent(
+            WalletViewBottomSheetContent.AccountBottomSheet -> AccountBottomSheetContent(
               accounts = uiState.accounts,
               balances = uiState.balances,
               selectAccount = { account, balance ->
@@ -123,11 +123,12 @@ fun WalletView(
               },
               importAccountHasError = uiState.importAccountHasError
             )
-            WalletViewBottomSheetView.NetworkBottomSheet -> NetworkBottomSheetContent(
+            WalletViewBottomSheetContent.NetworkBottomSheet -> NetworkBottomSheetContent(
               selectNetwork = viewModel::setSelectedNetwork,
-              isNetworkSelected = viewModel::isNetworkSelected
+              isNetworkSelected = viewModel::isNetworkSelected,
+              onClose = { closeSheet() }
             )
-            WalletViewBottomSheetView.ReceivePaymentBottomSheet -> ReceivePaymentBottomSheetContent(
+            WalletViewBottomSheetContent.ReceivePaymentBottomSheet -> ReceivePaymentBottomSheetContent(
               address = uiState.selectedAccount?.address,
               copyToClipboard = {
                 clipboardManager.setText(AnnotatedString(uiState.selectedAccount?.address?.hex ?: ""))
@@ -164,7 +165,7 @@ fun WalletView(
                 modifier = Modifier
                   .clickable {
                     if (sheetState.isVisible) closeSheet()
-                    else openSheet(WalletViewBottomSheetView.AccountBottomSheet)
+                    else openSheet(WalletViewBottomSheetContent.AccountBottomSheet)
                   }
                   .size(36.dp)
                   .align(Alignment.CenterStart)
@@ -197,7 +198,7 @@ fun WalletView(
                 modifier = Modifier
                   .clickable {
                     if (sheetState.isVisible) closeSheet()
-                    else openSheet(WalletViewBottomSheetView.NetworkBottomSheet)
+                    else openSheet(WalletViewBottomSheetContent.NetworkBottomSheet)
                   }
                   .align(Alignment.Center)
               ) {
@@ -256,7 +257,7 @@ fun WalletView(
               SecondaryButton(
                 onClick = {
                   if (sheetState.isVisible) closeSheet()
-                  else openSheet(WalletViewBottomSheetView.ReceivePaymentBottomSheet)
+                  else openSheet(WalletViewBottomSheetContent.ReceivePaymentBottomSheet)
                 },
                 text = "Receive",
                 leadingIcon = {

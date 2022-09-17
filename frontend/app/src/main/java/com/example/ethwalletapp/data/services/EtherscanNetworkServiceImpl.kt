@@ -10,7 +10,6 @@ import javax.inject.Singleton
 
 enum class EthereumNetwork {
   Mainnet,
-  Kovan,
   Goerli,
   Rinkeby,
   Ropsten,
@@ -19,7 +18,6 @@ enum class EthereumNetwork {
   fun chainId(): BigInteger {
     return when (this) {
       Mainnet -> BigInteger.valueOf(1)
-      Kovan -> BigInteger.valueOf(42)
       Goerli -> BigInteger.valueOf(5)
       Rinkeby -> BigInteger.valueOf(4)
       Ropsten -> BigInteger.valueOf(3)
@@ -30,11 +28,10 @@ enum class EthereumNetwork {
   fun color(): Color {
     return when (this) {
       Mainnet -> Blue5
-      Kovan -> Yellow5
       Goerli -> Green5
-      Rinkeby -> Pink
+      Rinkeby -> Yellow5
       Ropsten -> Red5
-      Sepolia -> Turquoise5
+      Sepolia -> Pink
     }
   }
 }
@@ -54,7 +51,6 @@ class EtherscanNetworkServiceImpl @Inject constructor(
     selectedNetwork = network
     val baseUrl = when (selectedNetwork) {
       EthereumNetwork.Mainnet -> "https://api.etherscan.io/"
-      EthereumNetwork.Kovan -> "https://api-kovan.etherscan.io/"
       EthereumNetwork.Goerli -> "https://api-goerli.etherscan.io/"
       EthereumNetwork.Rinkeby -> "https://api-rinkeby.etherscan.io/"
       EthereumNetwork.Ropsten -> "https://api-ropsten.etherscan.io/"

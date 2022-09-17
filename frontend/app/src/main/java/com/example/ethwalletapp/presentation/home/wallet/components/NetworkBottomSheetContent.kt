@@ -17,12 +17,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.data.services.EthereumNetwork
+import com.example.ethwalletapp.shared.components.AppTextButton
 import com.example.ethwalletapp.shared.theme.Green5
 
 @Composable
 fun NetworkBottomSheetContent(
   selectNetwork: (network: EthereumNetwork) -> Unit,
-  isNetworkSelected: (network: EthereumNetwork) -> Boolean
+  isNetworkSelected: (network: EthereumNetwork) -> Boolean,
+  onClose: () -> Unit
 ) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,6 +47,12 @@ fun NetworkBottomSheetContent(
         )
       }
     }
+    Spacer(Modifier.height(34.dp))
+    AppTextButton(
+      onClick =  onClose,
+      text = "Close"
+    )
+    Spacer(Modifier.height(42.dp))
   }
 }
 
@@ -53,7 +61,8 @@ fun NetworkBottomSheetContent(
 private fun NetworkBottomSheetContentPreview() {
   NetworkBottomSheetContent(
     selectNetwork = {},
-    isNetworkSelected = {true}
+    isNetworkSelected = {true},
+    onClose = {}
   )
 }
 

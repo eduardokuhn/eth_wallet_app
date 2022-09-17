@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.home.wallet.components
+package com.example.ethwalletapp.presentation.send_payment.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,19 +18,16 @@ import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.shared.components.AccountListItem
-import com.example.ethwalletapp.shared.components.AppTextButton
 import com.example.ethwalletapp.shared.utils.Constant
 import org.kethereum.model.Address
 import java.math.BigInteger
 
 @Composable
-fun DefaultAccountBottomSheetContentView(
+fun SendToViewBottomSheetContentBody(
   accounts: List<AccountEntry>?,
+  onSelect: (account: AccountEntry, balance: BalanceEntry?) -> Unit,
   balances: List<BalanceEntry>?,
-  onSelect: (account: AccountEntry, BalanceEntry?) -> Unit,
-  isAccountSelected: (account: AccountEntry) -> Boolean,
-  onCreateNewAccount: () -> Unit,
-  onImportAccount: () -> Unit
+  isAccountSelected: (account: AccountEntry) -> Boolean
 ) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -38,7 +35,7 @@ fun DefaultAccountBottomSheetContentView(
   ) {
     Spacer(Modifier.height(16.dp))
     Text(
-      text = "Account",
+      text = "Accounts",
       fontSize = 18.sp,
       fontWeight = FontWeight.SemiBold,
       color = Color.White,
@@ -51,22 +48,20 @@ fun DefaultAccountBottomSheetContentView(
             account = account,
             onSelect = onSelect,
             balance = balances?.firstOrNull { balance -> balance.address == account.address },
+            showAddress = true,
             isAccountSelected = isAccountSelected
           )
           if (index < accounts.lastIndex) Spacer(Modifier.height(36.dp))
         }
       }
     }
-    Spacer(Modifier.height(36.dp))
-    AppTextButton(onClick = onCreateNewAccount, text = "Create New Account")
-    AppTextButton(onClick = onImportAccount, text = "Import Account")
     Spacer(Modifier.height(42.dp))
   }
 }
 
 @Preview
 @Composable
-private fun DefaultAccountBottomSheetContentViewPreview() {
+private fun SendToViewBottomSheetContentBodyPreview() {
   val accounts = listOf(
     AccountEntry(
       address = Address("0x71C7656EC7ab88b098defB751B7401B5f6d8976F"),
@@ -137,12 +132,10 @@ private fun DefaultAccountBottomSheetContentViewPreview() {
       balance = BigInteger.valueOf(0)
     )
   )
-  DefaultAccountBottomSheetContentView(
-    accounts,
-    balances,
-    { account, balance -> print("$account $balance") },
-    { true },
-    {},
-    {}
+  SendToViewBottomSheetContentBody(
+    accounts = accounts,
+    onSelect = { account, balance -> println("$account $balance") },
+    balances = balances,
+    isAccountSelected = { true }
   )
 }

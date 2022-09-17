@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +62,7 @@ fun CreateWalletScreen(
           modifier = Modifier.align(Alignment.CenterStart)
         ) {
           Icon(
-            Icons.Filled.ArrowBack,
+            Icons.Outlined.KeyboardArrowLeft,
             contentDescription = "Back to start screen",
             tint = Color.White
           )
