@@ -1,9 +1,9 @@
 package com.example.ethwalletapp.data.services
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
-import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import org.kethereum.DEFAULT_ETHEREUM_BIP44_PATH
 import org.kethereum.bip32.model.ExtendedKey
 import org.kethereum.bip39.dirtyPhraseToMnemonicWords
@@ -15,7 +15,9 @@ import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
 import org.kethereum.crypto.toAddress
 import org.kethereum.crypto.toECKeyPair
 import org.kethereum.eip191.signWithEIP191PersonalSign
+import org.kethereum.erc55.isValid
 import org.kethereum.keystore.api.KeyStore
+import org.kethereum.model.Address
 import org.kethereum.model.ECKeyPair
 import org.kethereum.model.PrivateKey
 import org.komputing.khex.extensions.hexToByteArray
@@ -37,6 +39,7 @@ import javax.inject.Singleton
 interface IAccountService {
   fun generateSecretRecoveryPhrase(): String
   fun validateSecretRecoveryPhrase(secretRecoveryPhrase: String): Boolean
+  fun validateAddress(address: String): Boolean
   suspend fun createMasterAccount(secretRecoveryPhrase: String, password: String)
   suspend fun createChildAccount(name: String?): AccountEntry?
   suspend fun importMasterAccount(secretRecoveryPhrase: String, password: String)
@@ -62,6 +65,10 @@ class AccountServiceImpl @Inject constructor(
   override fun validateSecretRecoveryPhrase(secretRecoveryPhrase: String): Boolean {
     val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
     return mnemonicWords.validate(WORDLIST_ENGLISH)
+  }
+
+  override fun validateAddress(address: String): Boolean {
+    return Address(address).isValid()
   }
 
   private fun ECKeyPair.isValid() = try {
@@ -111,7 +118,10 @@ class AccountServiceImpl @Inject constructor(
           addressIndex = addressIndex
         )
       )
-    } else null
+    } else {
+      Log.e("AccountServiceImpl.createChildAccount", "SRP and password fields are null")
+      null
+    }
   }
 
   override suspend fun importMasterAccount(secretRecoveryPhrase: String, password: String) {

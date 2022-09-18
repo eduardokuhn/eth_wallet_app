@@ -16,9 +16,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface IBalanceRepository {
-  suspend fun getPrice(): NetworkResult<Double>
-  suspend fun getAddressBalance(address: Address): NetworkResult<BalanceEntry>
-  suspend fun getAddressesBalance(addresses: List<Address>): NetworkResult<List<BalanceEntry>>
+  suspend fun getPrice(runLocally: Boolean = false): NetworkResult<Double>
+  suspend fun getAddressBalance(
+    address: Address,
+    runLocally: Boolean = false
+  ): NetworkResult<BalanceEntry>
+  suspend fun getAddressesBalance(
+    addresses: List<Address>,
+    runLocally: Boolean = false
+  ): NetworkResult<List<BalanceEntry>>
   suspend fun createAddressBalance(address: Address): BalanceEntry
 }
 
@@ -30,15 +36,15 @@ class BalanceRepositoryImpl @Inject constructor(
   private val sharedPreferences: SharedPreferences,
   private val connectivityService: IConnectivityService
 ): IBalanceRepository {
-  override suspend fun getPrice(): NetworkResult<Double> {
-    if (connectivityService.hasConnection()) {
+  override suspend fun getPrice(runLocally: Boolean): NetworkResult<Double> {
+    if (connectivityService.hasConnection() && !runLocally) {
       val resp = ethereumApi.price()
       val body = resp.body()
 
       return try {
         if (resp.isSuccessful && body != null) {
           val price = body["result"].asJsonObject["ethusd"].asString
-          sharedPreferences.edit().putString("ethusd_price", price)
+          sharedPreferences.edit().putString("ethusd_price", price).apply()
           NetworkResult.Success(price.toDouble())
         } else {
           NetworkResult.Error(resp.code(), resp.message())
@@ -50,13 +56,13 @@ class BalanceRepositoryImpl @Inject constructor(
         NetworkResult.Exception(e)
       }
     } else {
-      val price = sharedPreferences.getString("ethusd_price", "0.0") ?: "0.0"
-      return NetworkResult.Success(price.toDouble())
+      val price = sharedPreferences.getString("ethusd_price", "0.0")
+      return NetworkResult.Success(price!!.toDouble())
     }
   }
 
-  override suspend fun getAddressBalance(address: Address): NetworkResult<BalanceEntry> {
-    if (connectivityService.hasConnection()) {
+  override suspend fun getAddressBalance(address: Address, runLocally: Boolean): NetworkResult<BalanceEntry> {
+    if (connectivityService.hasConnection() && !runLocally) {
       val resp = ethereumApi.balance(address.hex)
       val body = resp.body()
 
@@ -83,8 +89,8 @@ class BalanceRepositoryImpl @Inject constructor(
     }
   }
 
-  override suspend fun getAddressesBalance(addresses: List<Address>): NetworkResult<List<BalanceEntry>> {
-    if (connectivityService.hasConnection()) {
+  override suspend fun getAddressesBalance(addresses: List<Address>, runLocally: Boolean): NetworkResult<List<BalanceEntry>> {
+    if (connectivityService.hasConnection() && !runLocally) {
       val resp = ethereumApi.balances(addresses.joinToString(","))
       val body = resp.body()
 

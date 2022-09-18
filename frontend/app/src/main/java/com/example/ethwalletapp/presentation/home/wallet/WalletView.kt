@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.ethwalletapp.R
 import com.example.ethwalletapp.presentation.home.wallet.components.AccountBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.NetworkBottomSheetContent
@@ -33,6 +34,7 @@ import com.example.ethwalletapp.presentation.home.wallet.components.ReceivePayme
 import com.example.ethwalletapp.presentation.home.wallet.components.TokenListItem
 import com.example.ethwalletapp.shared.components.ErrorBanner
 import com.example.ethwalletapp.shared.components.SecondaryButton
+import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.Gradient07
 import com.example.ethwalletapp.shared.theme.Gray24
 import com.example.ethwalletapp.shared.theme.Green5
@@ -50,6 +52,7 @@ sealed class WalletViewBottomSheetContent() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WalletView(
+  navController: NavController?,
   viewModel: IWalletViewViewModel,
   setShowTabBar: (value: Boolean) -> Unit
 ) {
@@ -242,7 +245,7 @@ fun WalletView(
             Spacer(Modifier.height(28.dp))
             Row {
               SecondaryButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController?.navigate("${Screen.SendPaymentScreen.route}/${uiState.selectedAccount?.address?.hex}") },
                 text = "Send",
                 leadingIcon = {
                   Icon(
@@ -297,5 +300,5 @@ fun WalletView(
 @Composable
 private fun WalletViewPreview() {
   fun setShowTabBar(value: Boolean) {}
-  WalletView(WalletViewViewModelMock(), ::setShowTabBar)
+  WalletView(null, WalletViewViewModelMock(), ::setShowTabBar)
 }

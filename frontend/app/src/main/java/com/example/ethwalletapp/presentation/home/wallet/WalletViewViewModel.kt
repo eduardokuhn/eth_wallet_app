@@ -137,7 +137,7 @@ class WalletViewViewModel @Inject constructor(
         account.address
       }
 
-      val result = balanceRepository.getAddressesBalance(addresses)
+      val result = balanceRepository.getAddressesBalance(addresses, false)
 
       if (result is NetworkResult.Success && result.data.isNotEmpty()) {
         val balances = result.data
@@ -197,7 +197,7 @@ class WalletViewViewModel @Inject constructor(
     val importedAccount = accountService.importExternAccount(uiState.value.importAccountPrivateKey)
 
     return if (importedAccount != null) {
-      val result = balanceRepository.getAddressBalance(importedAccount.address)
+      val result = balanceRepository.getAddressBalance(importedAccount.address, false)
 
       return if (result is NetworkResult.Success) {
         val importedAccountBalance = result.data

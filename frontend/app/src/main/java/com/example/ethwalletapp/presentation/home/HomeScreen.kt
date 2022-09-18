@@ -1,13 +1,15 @@
 package com.example.ethwalletapp.presentation.home
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -19,17 +21,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.ethwalletapp.presentation.settings.SettingsView
+import androidx.navigation.NavController
 import com.example.ethwalletapp.presentation.home.wallet.WalletView
 import com.example.ethwalletapp.presentation.home.wallet.WalletViewViewModel
-import com.example.ethwalletapp.shared.theme.*
-import com.google.accompanist.pager.*
+import com.example.ethwalletapp.presentation.settings.SettingsView
+import com.example.ethwalletapp.shared.theme.Gradient06
+import com.example.ethwalletapp.shared.theme.Gray12
+import com.example.ethwalletapp.shared.theme.Gray24
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+  navController: NavController?
+) {
   Scaffold(
     backgroundColor = Gray24
   ) { padding ->
@@ -52,7 +62,8 @@ fun HomeScreen() {
       TabContent(
         viewCount = views.size,
         pagerState = pagerState,
-        setShowTabBar = ::setShowTabBar
+        setShowTabBar = ::setShowTabBar,
+        navController = navController
       )
       if (showTabBar.value) TabBar(pagerState, scope, views)
     }
@@ -62,7 +73,7 @@ fun HomeScreen() {
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-  HomeScreen()
+  HomeScreen(null)
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -70,7 +81,8 @@ private fun HomeScreenPreview() {
 private fun ColumnScope.TabContent(
   viewCount: Int,
   pagerState: PagerState,
-  setShowTabBar: (value: Boolean) -> Unit
+  setShowTabBar: (value: Boolean) -> Unit,
+  navController: NavController?
 ) {
   HorizontalPager(
     count = viewCount,
@@ -80,7 +92,7 @@ private fun ColumnScope.TabContent(
     when (page) {
       0 -> {
         val viewModel: WalletViewViewModel = hiltViewModel()
-        WalletView(viewModel, setShowTabBar)
+        WalletView(navController, viewModel, setShowTabBar)
       }
       1 -> SettingsView()
     }

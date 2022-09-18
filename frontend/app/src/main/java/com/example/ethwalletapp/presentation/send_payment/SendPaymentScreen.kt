@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import com.example.ethwalletapp.presentation.send_payment.components.AmountView
 import com.example.ethwalletapp.presentation.send_payment.components.SendToView
 import com.example.ethwalletapp.shared.theme.Gray24
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SendPaymentScreen(
+  navController: NavController?,
   viewModel: ISendPaymentScreenViewModel,
   fromAccountAddress: String?
 ) {
@@ -53,9 +56,24 @@ fun SendPaymentScreen(
             toOwnAccount = uiState.toOwnAccount,
             setToOwnAccount = viewModel::setToOwnAccount,
             isToOwnAccountSelected = viewModel::isToOwnAccountSelected,
-            onNext = { scope.launch { pagerState.animateScrollToPage(1) } }
+            validateToAccountInput = viewModel::validateToAccountInput,
+            onNext = { scope.launch { pagerState.animateScrollToPage(1) } },
+            onClose = { navController?.popBackStack() },
           )
-          1 -> {}
+          1 -> AmountView(
+            hasSufficientFunds = uiState.hasSufficientFunds,
+            valueInputInEther = uiState.valueInputInEther,
+            valueInputInUsd = uiState.valueInputInUsd,
+            valueInput = uiState.valueInput,
+            setValueInput = viewModel::setValueInput,
+            isValueInputInUsd = uiState.isValueInputInUsd,
+            toggleIsValueInputInUsd = viewModel::toggleIsValueInputInUsd,
+            fromAccountBalance = uiState.fromAccountBalance,
+            useMax = viewModel::useMax,
+            onBack = { scope.launch { pagerState.animateScrollToPage(0) } },
+            onClose = { navController?.popBackStack() },
+            onNext = { scope.launch { pagerState.animateScrollToPage(2) } }
+          )
           2 -> {}
         }
       }
@@ -66,5 +84,5 @@ fun SendPaymentScreen(
 @Preview
 @Composable
 private fun SendPaymentScreenPreview() {
-  SendPaymentScreen(SendPaymentScreenViewModelMock(), "")
+  SendPaymentScreen(null, SendPaymentScreenViewModelMock(), "")
 }

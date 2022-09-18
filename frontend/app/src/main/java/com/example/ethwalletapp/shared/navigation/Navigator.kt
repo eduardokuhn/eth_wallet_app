@@ -34,14 +34,14 @@ fun Navigator(startDestination: String) {
       ImportWalletScreen(navController, viewModel)
     }
     composable(route = Screen.HomeScreen.route) {
-      HomeScreen()
+      HomeScreen(navController)
     }
     composable(
       route = "${Screen.SendPaymentScreen.route}/{fromAccountAddress}",
       arguments = listOf(navArgument("fromAccountAddress") { type = NavType.StringType })
     ) { backStackEntry ->
       val viewModel: SendPaymentScreenViewModel = hiltViewModel()
-      SendPaymentScreen(viewModel, backStackEntry.arguments?.getString("fromAccountAddress"))
+      SendPaymentScreen(navController, viewModel, backStackEntry.arguments?.getString("fromAccountAddress"))
     }
   }
 }

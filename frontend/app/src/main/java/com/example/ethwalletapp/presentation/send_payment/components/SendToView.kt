@@ -48,12 +48,14 @@ fun SendToView(
   fromAccountBalance: BalanceEntry?,
   toAccountInput: String,
   setToAccountInput: (value: String) -> Unit,
-  toAccountInputHelperText: String,
+  toAccountInputHelperText: String?,
   isToAccountInputValid: Boolean,
   toOwnAccount: AccountEntry?,
   setToOwnAccount: (account: AccountEntry?, balance: BalanceEntry?) -> Unit,
   isToOwnAccountSelected: (account: AccountEntry) -> Boolean,
-  onNext: () -> Unit
+  onNext: () -> Unit,
+  validateToAccountInput: () -> Boolean,
+  onClose: () -> Unit,
 ) {
   var currentBottomSheetContent: SendToViewBottomSheetContent? by remember {
     mutableStateOf(null)
@@ -98,12 +100,14 @@ fun SendToView(
     sheetBackgroundColor = Gray24
   ) {
     Column(
-      modifier = Modifier
-        .padding(horizontal = 24.dp)
-        .fillMaxSize()
+      modifier = Modifier.fillMaxSize()
     ) {
       Spacer(Modifier.height(8.dp))
-      Box(Modifier.fillMaxWidth()) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 10.dp)
+      ) {
         Text(
           text = "Send to",
           fontSize = 18.sp,
@@ -112,7 +116,7 @@ fun SendToView(
           modifier = Modifier.align(Alignment.Center)
         )
         IconButton(
-          onClick = { /*TODO*/ },
+          onClick =  onClose,
           modifier = Modifier.align(Alignment.CenterEnd)
         ) {
           Icon(
@@ -123,68 +127,78 @@ fun SendToView(
         }
       }
       Spacer(Modifier.height(24.dp))
-      Text(
-        text = "From",
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color.White
-      )
-      Spacer(Modifier.height(22.dp))
-      AccountInput(
-        selectedAccount = fromAccount,
-        selectedAccountBalance = fromAccountBalance,
-        onClick = { openSheet(SendToViewBottomSheetContent.FromAccountBottomSheet) },
-        trailingIcon = {
-          Icon(
-            Icons.Outlined.KeyboardArrowRight,
-            contentDescription = "Open accounts sheet",
-            tint = Color.White
-          )
-        }
-      )
-      Spacer(Modifier.height(22.dp))
-      Text(
-        text = "To",
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color.White
-      )
-      Spacer(Modifier.height(22.dp))
-      if (toOwnAccount != null) {
+      Column(
+        modifier = Modifier
+          .padding(horizontal = 24.dp)
+          .fillMaxSize()
+      ) {
+        Text(
+          text = "From",
+          fontSize = 18.sp,
+          fontWeight = FontWeight.SemiBold,
+          color = Color.White
+        )
+        Spacer(Modifier.height(22.dp))
         AccountInput(
-          selectedAccount = toOwnAccount,
-          selectedAccountBalance = null,
-          showAddress = true,
-          onClick = { setToOwnAccount(null, null) },
+          selectedAccount = fromAccount,
+          selectedAccountBalance = fromAccountBalance,
+          onClick = { openSheet(SendToViewBottomSheetContent.FromAccountBottomSheet) },
           trailingIcon = {
             Icon(
-              Icons.Outlined.Close,
-              contentDescription = "Remove to own account",
+              Icons.Outlined.KeyboardArrowRight,
+              contentDescription = "Open accounts sheet",
               tint = Color.White
             )
           }
         )
+        Spacer(Modifier.height(22.dp))
+        Text(
+          text = "To",
+          fontSize = 18.sp,
+          fontWeight = FontWeight.SemiBold,
+          color = Color.White
+        )
+        Spacer(Modifier.height(22.dp))
+        if (toOwnAccount != null) {
+          AccountInput(
+            selectedAccount = toOwnAccount,
+            selectedAccountBalance = null,
+            showAddress = true,
+            onClick = { setToOwnAccount(null, null) },
+            trailingIcon = {
+              Icon(
+                Icons.Outlined.Close,
+                contentDescription = "Remove to own account",
+                tint = Color.White
+              )
+            }
+          )
+        } else {
+          TextInput(
+            value = toAccountInput,
+            onValueChange = setToAccountInput,
+            label = "Public address (0x)",
+            helperText = toAccountInputHelperText,
+            hasError = !isToAccountInputValid
+          )
+        }
+        AppTextButton(
+          onClick = { openSheet(SendToViewBottomSheetContent.ToAccountBottomSheet) },
+          text = "Transfer Between My Accounts",
+          textStyle = TextStyle(textDecoration = TextDecoration.Underline)
+        )
+        Spacer(Modifier.weight(1f))
+        PrimaryButton(
+          onClick = {
+            val ok = validateToAccountInput()
+            if (ok) onNext()
+          },
+          text = "Next",
+          disabled = !isToAccountInputValid,
+          modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(42.dp))
       }
-      TextInput(
-        value = toAccountInput,
-        onValueChange = setToAccountInput,
-        label = "Public address (0x)",
-        helperText = toAccountInputHelperText,
-        hasError = !isToAccountInputValid
-      )
-      AppTextButton(
-        onClick = { openSheet(SendToViewBottomSheetContent.ToAccountBottomSheet) },
-        text = "Transfer Between My Accounts",
-        textStyle = TextStyle(textDecoration = TextDecoration.Underline)
-      )
-      Spacer(Modifier.weight(1f))
-      PrimaryButton(
-        onClick = onNext,
-        text = "Next",
-        disabled = !isToAccountInputValid || toOwnAccount != null,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Spacer(Modifier.height(42.dp))
     }
   }
 }
@@ -263,6 +277,7 @@ private fun SendToViewPreview() {
     )
   )
   SendToView(
+    onClose = {},
     accounts = accounts,
     fromAccount = accounts[0],
     balances = balances,
@@ -276,7 +291,8 @@ private fun SendToViewPreview() {
     isToOwnAccountSelected = { true },
     onNext = {},
     isFromAccountSelected = { true },
-    setFromAccount = { account, balance -> print("$account $balance") }
+    setFromAccount = { account, balance -> print("$account $balance") },
+    validateToAccountInput = {true}
   )
 }
 
@@ -323,7 +339,8 @@ private fun AccountInput(
             else "Balance: __.__ ETH"
           },
         fontSize = 12.sp,
-        color = Gray12
+        color = Gray12,
+        maxLines = 1
       )
     }
     trailingIcon.invoke()

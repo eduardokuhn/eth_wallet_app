@@ -53,19 +53,25 @@ fun PrimaryButton(
           )
       }
     else
-      Text(
-        text = text,
-        fontSize = 16.sp,
-        color = Gray18,
-        modifier = Modifier.padding(horizontal = 16.dp)
-      )
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .padding(horizontal = 16.dp)
+          .fillMaxSize()
+      ) {
+        Text(
+          text = text,
+          fontSize = 16.sp,
+          color = Gray18
+        )
+      }
   }
 }
 
 @Preview
 @Composable
 private fun PrimaryButtonPreview() {
-  PrimaryButton(onClick = {}, text = "Enter")
+  PrimaryButton(onClick = {}, text = "Enter", disabled = true)
 }
 
 @Preview

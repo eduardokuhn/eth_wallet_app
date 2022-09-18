@@ -24,6 +24,7 @@ import com.example.ethwalletapp.shared.theme.Primary5
 fun SecondaryButton(
   onClick: () -> Unit,
   text: String,
+  fontWeight: FontWeight  = FontWeight.Bold,
   leadingIcon: @Composable (() -> Unit)? = null,
   trailingIcon: @Composable (() -> Unit)? = null,
   modifier: Modifier = Modifier,
@@ -46,7 +47,7 @@ fun SecondaryButton(
       Text(
         text = text,
         fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
+        fontWeight = fontWeight,
         color = Color.White,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
