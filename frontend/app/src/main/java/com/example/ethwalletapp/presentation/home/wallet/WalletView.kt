@@ -245,7 +245,8 @@ fun WalletView(
             Spacer(Modifier.height(28.dp))
             Row {
               SecondaryButton(
-                onClick = { navController?.navigate("${Screen.SendPaymentScreen.route}/${uiState.selectedAccount?.address?.hex}") },
+                // TODO receive bool if with transaction status
+                onClick = { navController?.navigate("${Screen.SendPaymentBottomSheet.route}/${uiState.selectedAccount?.address?.hex}") },
                 text = "Send",
                 leadingIcon = {
                   Icon(
@@ -287,7 +288,9 @@ fun WalletView(
               name = "Ethereum",
               abbr = "ETH",
               value = uiState.ethUsdPrice,
-              balance = uiState.selectedAccountBalance?.balance
+              balance = uiState.selectedAccountBalance?.balance?.let {
+                EthereumUnitConverter.weiToEther(it)
+              }
             )
           }
         } else CircularProgressIndicator(color = Primary5)

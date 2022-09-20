@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.data.models.BalanceEntry
+import com.example.ethwalletapp.shared.components.ErrorBanner
 import com.example.ethwalletapp.shared.components.SecondaryButton
 import com.example.ethwalletapp.shared.theme.Blue5
 import com.example.ethwalletapp.shared.theme.Gradient07
@@ -57,6 +58,13 @@ fun AmountView(
   onNext: () -> Unit
 ) {
   Column(Modifier.fillMaxSize()) {
+    if (!hasSufficientFunds) {
+      ErrorBanner(
+        title = "Insufficient funds!",
+        description = "Retry another value"
+      )
+    }
+
     Spacer(Modifier.height(8.dp))
     Box(
       modifier = Modifier

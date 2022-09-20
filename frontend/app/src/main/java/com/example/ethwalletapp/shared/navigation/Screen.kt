@@ -5,7 +5,7 @@ sealed class Screen(val route: String) {
   object CreateWalletScreen: Screen("create_wallet_screen")
   object ImportWalletScreen: Screen("import_wallet_screen")
   object HomeScreen: Screen("home_screen")
-  object SendPaymentScreen: Screen("send_payment_screen")
+  object SendPaymentBottomSheet: Screen("send_payment_bottom_sheet")
 
   fun withArgs(vararg args: String): String {
     return buildString {

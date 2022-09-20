@@ -77,6 +77,7 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-pager:0.25.1"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.25.1"
+    implementation "com.google.accompanist:accompanist-navigation-material:0.25.1"
 
     implementation "com.github.komputing:kbip44:0.5"
     implementation "com.github.komputing:khex:1.1.2"
@@ -92,6 +93,9 @@ dependencies {
     implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
     implementation "com.github.komputing.kethereum:eip191:$kethereum_version"
     implementation "com.github.komputing.kethereum:erc55:$kethereum_version"
+    implementation "com.github.komputing.kethereum:rlp:$kethereum_version"
+    implementation "com.github.komputing.kethereum:extensions_transactions:$kethereum_version"
+    implementation "com.github.komputing.kethereum:keccak_shortcut:$kethereum_version"
 
     implementation 'com.google.dagger:hilt-android:2.43.2'
     kapt 'com.google.dagger:hilt-compiler:2.43.2'

@@ -35,13 +35,13 @@ class BalanceRepositoryImpl @Inject constructor(
   private val balanceDao: BalanceDao,
   private val sharedPreferences: SharedPreferences,
   private val connectivityService: IConnectivityService
-): IBalanceRepository {
+) : IBalanceRepository {
   override suspend fun getPrice(runLocally: Boolean): NetworkResult<Double> {
     if (connectivityService.hasConnection() && !runLocally) {
-      val resp = ethereumApi.price()
-      val body = resp.body()
-
       return try {
+        val resp = ethereumApi.price()
+        val body = resp.body()
+
         if (resp.isSuccessful && body != null) {
           val price = body["result"].asJsonObject["ethusd"].asString
           sharedPreferences.edit().putString("ethusd_price", price).apply()
@@ -50,7 +50,7 @@ class BalanceRepositoryImpl @Inject constructor(
           NetworkResult.Error(resp.code(), resp.message())
         }
       } catch (e: HttpException) {
-        NetworkResult.Error(resp.code(), resp.message())
+        NetworkResult.Error(e.code(), e.message())
       } catch (e: Throwable) {
         Log.e("BalanceRepositoryImpl.getPrice", "Exception: $e")
         NetworkResult.Exception(e)
@@ -63,10 +63,10 @@ class BalanceRepositoryImpl @Inject constructor(
 
   override suspend fun getAddressBalance(address: Address, runLocally: Boolean): NetworkResult<BalanceEntry> {
     if (connectivityService.hasConnection() && !runLocally) {
-      val resp = ethereumApi.balance(address.hex)
-      val body = resp.body()
-
       return try {
+        val resp = ethereumApi.balance(address.hex)
+        val body = resp.body()
+
         if (resp.isSuccessful && body != null) {
           val balance = BalanceEntry(
             address = address,
@@ -91,10 +91,10 @@ class BalanceRepositoryImpl @Inject constructor(
 
   override suspend fun getAddressesBalance(addresses: List<Address>, runLocally: Boolean): NetworkResult<List<BalanceEntry>> {
     if (connectivityService.hasConnection() && !runLocally) {
-      val resp = ethereumApi.balances(addresses.joinToString(","))
-      val body = resp.body()
-
       return try {
+        val resp = ethereumApi.balances(addresses.joinToString(","))
+        val body = resp.body()
+
         if (resp.isSuccessful && body != null) {
           val balances = mutableListOf<BalanceEntry>()
 

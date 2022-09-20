@@ -9,26 +9,30 @@ import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
+import com.example.ethwalletapp.data.repositories.ITransactionRepository
 import com.example.ethwalletapp.data.services.IAccountService
+import com.example.ethwalletapp.data.services.ITransactionService
 import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import com.example.ethwalletapp.shared.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.kethereum.DEFAULT_GAS_LIMIT
+import org.kethereum.model.Address
 import java.math.BigInteger
 import javax.inject.Inject
 
-data class SendPaymentScreenUIState(
+data class SendPaymentBottomSheetUIState(
   // SendToView - START
   val accounts: MutableList<AccountEntry> = mutableListOf(),
   val fromAccount: AccountEntry? = null,
   val balances: MutableList<BalanceEntry> = mutableListOf(),
   val fromAccountBalance: BalanceEntry? = null,
-  val ethUsdPrice: Double? = null,
+  val ethUsdPrice: Double? = 0.0,
+  val toAccount: AccountEntry? = null,
   val toAccountInput: String = "",
   val toAccountInputHelperText: String? = null,
   val isToAccountInputValid: Boolean = true,
-  val toOwnAccount: AccountEntry? = null,
   val viewState: ViewState = ViewState.Unknown,
   // SendToView - END
 
@@ -39,17 +43,25 @@ data class SendPaymentScreenUIState(
   val valueInput: String = "0",
   val isValueInputInUsd: Boolean = false,
   // AmountView - END
+
+  // ConfirmView - START
+  // TODO bug
+  val networkFeeInEther: BigInteger = EthereumUnitConverter.gweiToEther(DEFAULT_GAS_LIMIT * BigInteger.valueOf(200)),
+  val totalValueInEther: BigInteger? = valueInputInEther?.let { BigInteger.valueOf(it.toLong()) + networkFeeInEther },
+  val totalValueInUsd: Double? = ethUsdPrice?.let { totalValueInEther?.toDouble()?.times(it) },
+  val confirmViewState: ViewState = ViewState.Unknown
+  // ConfirmView - END
 )
 
-interface ISendPaymentScreenViewModel {
-  var uiState: MutableState<SendPaymentScreenUIState>
+interface ISendPaymentBottomSheetViewModel {
+  var uiState: MutableState<SendPaymentBottomSheetUIState>
   // SendToView - START
   fun setFromAccount(account: AccountEntry, balance: BalanceEntry?)
   fun isFromAccountSelected(account: AccountEntry): Boolean
   fun setToAccountInput(value: String)
   fun validateToAccountInput(): Boolean
-  fun setToOwnAccount(account: AccountEntry?, balance: BalanceEntry?)
-  fun isToOwnAccountSelected(account: AccountEntry): Boolean
+  fun setToAccount(account: AccountEntry?, balance: BalanceEntry?)
+  fun isToAccountSelected(account: AccountEntry): Boolean
   // SendToView - END
 
   // AmountView - START
@@ -57,29 +69,36 @@ interface ISendPaymentScreenViewModel {
   fun toggleIsValueInputInUsd()
   fun useMax()
   // AmountView - END
+
+  // ConfirmView - START
+  suspend fun sendTransaction(): Boolean
+  // ConfirmView - END
 }
 
-class SendPaymentScreenViewModelMock : ISendPaymentScreenViewModel {
-  override var uiState = mutableStateOf(SendPaymentScreenUIState())
+class SendPaymentBottomSheetViewModelMock : ISendPaymentBottomSheetViewModel {
+  override var uiState = mutableStateOf(SendPaymentBottomSheetUIState())
   override fun setFromAccount(account: AccountEntry, balance: BalanceEntry?) {}
   override fun isFromAccountSelected(account: AccountEntry): Boolean { return true }
   override fun setToAccountInput(value: String) {}
   override fun validateToAccountInput(): Boolean { return true }
-  override fun setToOwnAccount(account: AccountEntry?, balance: BalanceEntry?) {}
-  override fun isToOwnAccountSelected(account: AccountEntry): Boolean { return true }
+  override fun setToAccount(account: AccountEntry?, balance: BalanceEntry?) {}
+  override fun isToAccountSelected(account: AccountEntry): Boolean { return true }
   override fun setValueInput(value: String) {}
   override fun toggleIsValueInputInUsd() {}
   override fun useMax() {}
+  override suspend fun sendTransaction(): Boolean { return true }
 }
 
 @HiltViewModel
-class SendPaymentScreenViewModel @Inject constructor(
+class SendPaymentBottomSheetViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
   private val accountService: IAccountService,
   private val accountRepository: IAccountRepository,
   private val balanceRepository: IBalanceRepository,
-) : ViewModel(), ISendPaymentScreenViewModel {
-  override var uiState = mutableStateOf(SendPaymentScreenUIState())
+  private val transactionService: ITransactionService,
+  private val transactionRepository: ITransactionRepository
+) : ViewModel(), ISendPaymentBottomSheetViewModel {
+  override var uiState = mutableStateOf(SendPaymentBottomSheetUIState())
 
   init {
     viewModelScope.launch {
@@ -94,6 +113,7 @@ class SendPaymentScreenViewModel @Inject constructor(
       fromAccount = account,
       fromAccountBalance = balance
     )
+    println("FromAccount: ${account.address.hex}")
   }
 
   override fun isFromAccountSelected(account: AccountEntry): Boolean {
@@ -107,28 +127,39 @@ class SendPaymentScreenViewModel @Inject constructor(
   }
 
   override fun validateToAccountInput(): Boolean {
-    return if (uiState.value.toOwnAccount == null) {
+    return if (uiState.value.toAccount == null) {
       val isValid = accountService.validateAddress(uiState.value.toAccountInput)
+      var toAccount: AccountEntry? = null
+
+      if (isValid) {
+        toAccount = AccountEntry(
+          address = Address(uiState.value.toAccountInput),
+          name = "Undefined name",
+          addressIndex = 9999
+        )
+      }
+
       uiState.value = uiState.value.copy(
         isToAccountInputValid = isValid,
-        toAccountInputHelperText = if (!isValid) "Invalid public address" else null
+        toAccountInputHelperText = if (!isValid) "Invalid public address" else null,
+        toAccount = toAccount
       )
       return isValid
     } else true
   }
 
-  override fun setToOwnAccount(account: AccountEntry?, balance: BalanceEntry?) {
+  override fun setToAccount(account: AccountEntry?, balance: BalanceEntry?) {
     uiState.value = uiState.value.copy(
-      toOwnAccount = account,
+      toAccount = account,
       toAccountInput = "",
-      toAccountInputHelperText = null,
       isToAccountInputValid = true,
+      toAccountInputHelperText = null,
     )
   }
 
-  override fun isToOwnAccountSelected(account: AccountEntry): Boolean {
-    return if (uiState.value.toOwnAccount != null)
-      account.address == uiState.value.toOwnAccount!!.address
+  override fun isToAccountSelected(account: AccountEntry): Boolean {
+    return if (uiState.value.toAccount != null)
+      account.address == uiState.value.toAccount!!.address
     else false
   }
 
@@ -221,6 +252,41 @@ class SendPaymentScreenViewModel @Inject constructor(
         if (!uiState.value.isValueInputInUsd) maxEther.toString()
         else (uiState.value.ethUsdPrice?.let { maxEther.div(it) }).toString()
     )
+  }
+
+  override suspend fun sendTransaction(): Boolean {
+   uiState.value = uiState.value.copy(confirmViewState = ViewState.Loading)
+
+    return if (
+      uiState.value.fromAccount != null &&
+      uiState.value.toAccount != null &&
+      uiState.value.valueInputInEther != null &&
+      uiState.value.hasSufficientFunds
+    ) {
+      val transaction = transactionService.createTransaction(
+        from = uiState.value.fromAccount!!,
+        to = uiState.value.toAccount!!,
+        value = uiState.value.valueInputInEther!!
+      )
+
+      if (transaction != null) {
+        val result = transactionRepository.sendTransaction(transaction)
+
+        if (result is NetworkResult.Success) {
+          uiState.value.copy(confirmViewState = ViewState.Success)
+          true
+        } else {
+          uiState.value = uiState.value.copy(confirmViewState = ViewState.Error)
+          false
+        }
+      } else {
+        uiState.value = uiState.value.copy(confirmViewState = ViewState.Error)
+        false
+      }
+    } else {
+      uiState.value = uiState.value.copy(confirmViewState = ViewState.Unknown)
+      false
+    }
   }
 
   private fun validateFunds() {

@@ -21,6 +21,7 @@ val Gradient08 = listOf(
 val Primary5 = Color(0xFF3D8DFF)
 
 // Gray
+val Gray = Color(0xFF171819)
 val Gray9 = Color(0xFF8FA2B7)
 val Gray12 = Color(0xFF6A84A0)
 val Gray18 = Color(0xFF384657)

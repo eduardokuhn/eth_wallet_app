@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0356452017b6fb21f8bc2edc0fb1aafb",
+    "identityHash": "c9b2e9291501fd4166a50291a294d134",
     "entities": [
       {
         "tableName": "account",
@@ -78,11 +78,17 @@
       },
       {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, `chain` BLOB, `creationEpochSecond` INTEGER, `from` TEXT, `gasLimit` BLOB, `gasPrice` BLOB, `input` BLOB NOT NULL, `nonce` BLOB, `to` TEXT, `txHash` TEXT, `value` BLOB, `blockHash` TEXT, `blockNumber` BLOB, `maxPriorityFeePerGas` BLOB, `maxFeePerGas` BLOB, `r` BLOB, `s` BLOB, `v` BLOB, `signed` INTEGER NOT NULL, `is_pending` INTEGER NOT NULL, `error` TEXT, PRIMARY KEY(`hash`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, `state` TEXT NOT NULL, `chain` BLOB, `creationEpochSecond` INTEGER, `from` TEXT, `gasLimit` BLOB, `gasPrice` BLOB, `input` BLOB NOT NULL, `nonce` BLOB, `to` TEXT, `txHash` TEXT, `value` BLOB, `blockHash` TEXT, `blockNumber` BLOB, `maxPriorityFeePerGas` BLOB, `maxFeePerGas` BLOB, `r` BLOB, `s` BLOB, `v` BLOB, PRIMARY KEY(`hash`))",
         "fields": [
           {
             "fieldPath": "hash",
             "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -187,24 +193,6 @@
             "columnName": "v",
             "affinity": "BLOB",
             "notNull": false
-          },
-          {
-            "fieldPath": "state.signed",
-            "columnName": "signed",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "state.isPending",
-            "columnName": "is_pending",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "state.error",
-            "columnName": "error",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
@@ -220,7 +208,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0356452017b6fb21f8bc2edc0fb1aafb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c9b2e9291501fd4166a50291a294d134')"
     ]
   }
 }

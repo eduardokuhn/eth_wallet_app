@@ -28,11 +28,7 @@ fun TokenListItem(
   value: Double?,
   balance: BigInteger?,
 ) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier
-      .fillMaxWidth()
-  ) {
+  Row(Modifier.fillMaxWidth()) {
     Image(
       painter = icon,
       contentDescription = "Ethereum Logo",

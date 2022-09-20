@@ -2,10 +2,7 @@ package com.example.ethwalletapp.presentation.send_payment.components
 
 import PrimaryButton
 import TextInput
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -23,16 +20,13 @@ import androidx.compose.ui.unit.sp
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.shared.components.AppTextButton
-import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Gray24
-import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.utils.Constant
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import kotlinx.coroutines.launch
 import org.kethereum.model.Address
 import java.math.BigInteger
 
-sealed class SendToViewBottomSheetContent() {
+sealed class SendToViewBottomSheetContent {
   object FromAccountBottomSheet: SendToViewBottomSheetContent()
   object ToAccountBottomSheet: SendToViewBottomSheetContent()
 }
@@ -50,9 +44,9 @@ fun SendToView(
   setToAccountInput: (value: String) -> Unit,
   toAccountInputHelperText: String?,
   isToAccountInputValid: Boolean,
-  toOwnAccount: AccountEntry?,
-  setToOwnAccount: (account: AccountEntry?, balance: BalanceEntry?) -> Unit,
-  isToOwnAccountSelected: (account: AccountEntry) -> Boolean,
+  toAccount: AccountEntry?,
+  setToAccount: (account: AccountEntry?, balance: BalanceEntry?) -> Unit,
+  isToAccountSelected: (account: AccountEntry) -> Boolean,
   onNext: () -> Unit,
   validateToAccountInput: () -> Boolean,
   onClose: () -> Unit,
@@ -89,9 +83,9 @@ fun SendToView(
           )
           SendToViewBottomSheetContent.ToAccountBottomSheet -> SendToViewBottomSheetContentBody(
             accounts = accounts,
-            onSelect = setToOwnAccount,
+            onSelect = setToAccount,
             balances = null,
-            isAccountSelected = isToOwnAccountSelected
+            isAccountSelected = isToAccountSelected
           )
         }
       }
@@ -159,12 +153,12 @@ fun SendToView(
           color = Color.White
         )
         Spacer(Modifier.height(22.dp))
-        if (toOwnAccount != null) {
+        if (toAccount != null) {
           AccountInput(
-            selectedAccount = toOwnAccount,
+            selectedAccount = toAccount,
             selectedAccountBalance = null,
             showAddress = true,
-            onClick = { setToOwnAccount(null, null) },
+            onClick = { setToAccount(null, null) },
             trailingIcon = {
               Icon(
                 Icons.Outlined.Close,
@@ -286,63 +280,12 @@ private fun SendToViewPreview() {
     setToAccountInput = {},
     toAccountInputHelperText = "",
     isToAccountInputValid = true,
-    toOwnAccount = null,
-    setToOwnAccount = { account, balance -> print("$account $balance") },
-    isToOwnAccountSelected = { true },
+    toAccount = null,
+    setToAccount = { account, balance -> print("$account $balance") },
+    isToAccountSelected = { true },
     onNext = {},
     isFromAccountSelected = { true },
     setFromAccount = { account, balance -> print("$account $balance") },
     validateToAccountInput = {true}
   )
-}
-
-@Composable
-private fun AccountInput(
-  selectedAccount: AccountEntry?,
-  selectedAccountBalance: BalanceEntry?,
-  showAddress: Boolean = false,
-  onClick: () -> Unit,
-  trailingIcon: @Composable () -> Unit
-) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier
-      .clickable { onClick() }
-      .fillMaxWidth()
-  ) {
-    Box(
-      modifier = Modifier
-        .size(40.dp)
-        .background(Green5, CircleShape)
-    ) {
-      Text(
-        text = if (selectedAccount != null) "${selectedAccount.addressIndex + 1}" else "?",
-        fontSize = 18.sp,
-        color = Color.White,
-        modifier = Modifier.align(Alignment.Center)
-      )
-    }
-    Spacer(Modifier.width(16.dp))
-    Column(Modifier.weight(1f)) {
-      Text(
-        text = selectedAccount?.name ?: "?",
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color.White
-      )
-      Spacer(Modifier.height(6.dp))
-      Text(
-        text =
-          if (showAddress && selectedAccount != null) selectedAccount.address.hex
-          else {
-            if (selectedAccountBalance != null) "Balance: ${EthereumUnitConverter.weiToEther(selectedAccountBalance.balance)} ETH"
-            else "Balance: __.__ ETH"
-          },
-        fontSize = 12.sp,
-        color = Gray12,
-        maxLines = 1
-      )
-    }
-    trailingIcon.invoke()
-  }
 }

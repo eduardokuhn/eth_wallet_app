@@ -135,7 +135,7 @@ class AccountServiceImpl @Inject constructor(
     accountRepository.saveAccount(
       AccountEntry(
         address = keyPair.toAddress(),
-        name = "Account 0",
+        name = "Account 1",
         addressIndex = 0
       )
     )

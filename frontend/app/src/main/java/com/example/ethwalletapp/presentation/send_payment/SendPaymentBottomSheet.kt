@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.ethwalletapp.presentation.send_payment.components.AmountView
+import com.example.ethwalletapp.presentation.send_payment.components.ConfirmView
 import com.example.ethwalletapp.presentation.send_payment.components.SendToView
 import com.example.ethwalletapp.shared.theme.Gray24
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -19,9 +20,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun SendPaymentScreen(
+fun SendPaymentBottomSheet(
   navController: NavController?,
-  viewModel: ISendPaymentScreenViewModel,
+  viewModel: ISendPaymentBottomSheetViewModel,
   fromAccountAddress: String?
 ) {
   Scaffold(
@@ -53,9 +54,9 @@ fun SendPaymentScreen(
             setToAccountInput = viewModel::setToAccountInput,
             toAccountInputHelperText = uiState.toAccountInputHelperText,
             isToAccountInputValid = uiState.isToAccountInputValid,
-            toOwnAccount = uiState.toOwnAccount,
-            setToOwnAccount = viewModel::setToOwnAccount,
-            isToOwnAccountSelected = viewModel::isToOwnAccountSelected,
+            toAccount = uiState.toAccount,
+            setToAccount = viewModel::setToAccount,
+            isToAccountSelected = viewModel::isToAccountSelected,
             validateToAccountInput = viewModel::validateToAccountInput,
             onNext = { scope.launch { pagerState.animateScrollToPage(1) } },
             onClose = { navController?.popBackStack() },
@@ -74,7 +75,24 @@ fun SendPaymentScreen(
             onClose = { navController?.popBackStack() },
             onNext = { scope.launch { pagerState.animateScrollToPage(2) } }
           )
-          2 -> {}
+          2 -> ConfirmView(
+            confirmViewState = uiState.confirmViewState,
+            valueInputInEther = uiState.valueInputInEther,
+            fromAccount = uiState.fromAccount,
+            fromAccountBalance = uiState.fromAccountBalance,
+            toAccount = uiState.toAccount,
+            networkFeeInEther = uiState.networkFeeInEther,
+            totalValueInEther = uiState.totalValueInEther,
+            totalValueInUsd = uiState.totalValueInUsd,
+            onBack = { scope.launch { pagerState.animateScrollToPage(1) } },
+            onClose = { navController?.popBackStack() },
+            onSend = {
+              scope.launch {
+                val ok = viewModel.sendTransaction()
+                if (ok) navController?.popBackStack()
+              }
+            }
+          )
         }
       }
     }
@@ -84,5 +102,5 @@ fun SendPaymentScreen(
 @Preview
 @Composable
 private fun SendPaymentScreenPreview() {
-  SendPaymentScreen(null, SendPaymentScreenViewModelMock(), "")
+  SendPaymentBottomSheet(null, SendPaymentBottomSheetViewModelMock(), "")
 }

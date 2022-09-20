@@ -9,10 +9,9 @@ interface IEthereumApi {
   suspend fun price(): Response<JsonObject>
   suspend fun balance(address: String): Response<JsonObject>
   suspend fun balances(addresses: String): Response<JsonObject>
-  suspend fun txReceiptStatus(hash: String): Response<JsonObject>
-  suspend fun transactionInfo(hash: String): Response<JsonObject>
+  suspend fun transactionReceiptStatus(hash: String): Response<JsonObject>
   suspend fun transactionCount(address: String): Response<JsonObject>
-  suspend fun sendTransaction(transaction: String): Response<JsonObject>
+  suspend fun sendRawTransaction(transaction: String): Response<JsonObject>
 }
 
 interface EtherscanApi : IEthereumApi {
@@ -26,15 +25,12 @@ interface EtherscanApi : IEthereumApi {
   override suspend fun balances(@Query("address") addresses: String): Response<JsonObject>
 
   @GET("api?module=transaction&action=gettxreceiptstatus&apikey=${Env.ETHERSCAN_API_TOKEN}")
-  override suspend fun txReceiptStatus(@Query("txhash") hash: String): Response<JsonObject>
-
-  @GET("api?module=proxy&action=eth_getTransactionByHash&apikey=${Env.ETHERSCAN_API_TOKEN}")
-  override suspend fun transactionInfo(@Query("txhash") hash: String): Response<JsonObject>
+  override suspend fun transactionReceiptStatus(@Query("txhash") hash: String): Response<JsonObject>
 
   @GET("api?module=proxy&action=eth_getTransactionCount&tag=latest&apikey=${Env.ETHERSCAN_API_TOKEN}")
   override suspend fun transactionCount(@Query("address") address: String): Response<JsonObject>
 
   @FormUrlEncoded
   @POST("api?module=proxy&action=eth_sendRawTransaction&apikey=${Env.ETHERSCAN_API_TOKEN}")
-  override suspend fun sendTransaction(@Field("hex") transaction: String): Response<JsonObject>
+  override suspend fun sendRawTransaction(@Field("hex") transaction: String): Response<JsonObject>
 }
