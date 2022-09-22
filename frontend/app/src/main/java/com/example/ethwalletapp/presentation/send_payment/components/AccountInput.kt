@@ -16,7 +16,7 @@ import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Green5
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
+import com.example.ethwalletapp.shared.utils.weiToEther
 
 @Composable
 fun AccountInput(
@@ -57,7 +57,7 @@ fun AccountInput(
         text =
         if (showAddress && selectedAccount != null) selectedAccount.address.hex
         else {
-          if (selectedAccountBalance != null) "Balance: ${EthereumUnitConverter.weiToEther(selectedAccountBalance.balance)} ETH"
+          if (selectedAccountBalance != null) "Balance: ${selectedAccountBalance.balance.weiToEther()} ETH"
           else "Balance: __.__ ETH"
         },
         fontSize = 12.sp,

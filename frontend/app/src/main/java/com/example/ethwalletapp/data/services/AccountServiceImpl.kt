@@ -99,10 +99,10 @@ class AccountServiceImpl @Inject constructor(
 
   override suspend fun createChildAccount(name: String?): AccountEntry? {
     // From the mnemonic phrase the master key can be created
-    val secretRecoveryPhrase = encryptedSharedPreferences.getString("srp", "") ?: ""
-    val password = encryptedSharedPreferences.getString("password", "") ?: ""
+    val secretRecoveryPhrase = encryptedSharedPreferences.getString("srp", "")
+    val password = encryptedSharedPreferences.getString("password", "")
 
-    return if (secretRecoveryPhrase.isNotEmpty() && password.isNotEmpty()) {
+    return if (secretRecoveryPhrase!!.isNotEmpty() && password!!.isNotEmpty()) {
       val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
       val addressIndex: Int = accountRepository.getLatestAddressIndex() + 1
       var path: String = DEFAULT_ETHEREUM_BIP44_PATH

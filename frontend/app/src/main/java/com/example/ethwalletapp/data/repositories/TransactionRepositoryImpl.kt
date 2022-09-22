@@ -20,7 +20,7 @@ interface ITransactionRepository {
   suspend fun getTransaction(hash: String): TransactionEntry
   suspend fun getAddressTransactions(address: Address, chainId: BigInteger): List<TransactionEntry>
   suspend fun getTransactionState(hash: String): NetworkResult<TransactionState>
-  suspend fun sendTransaction(transaction: TransactionEntry): NetworkResult<Boolean>
+  suspend fun sendTransaction(transaction: TransactionEntry): NetworkResult<String>
 }
 
 @Singleton
@@ -35,7 +35,7 @@ class TransactionRepositoryImpl @Inject constructor(
         val resp = ethereumApi.transactionCount(address.hex)
         val body = resp.body()
 
-        if (resp.isSuccessful &&  body != null) NetworkResult.Success(BigInteger(body["result"].asString.removePrefix("0x")))
+        if (resp.isSuccessful &&  body != null) NetworkResult.Success(BigInteger.valueOf(java.lang.Long.decode(body["result"].asString)))
         else NetworkResult.Error(resp.code(), resp.message())
       } catch (e: HttpException) {
         NetworkResult.Error(e.code(), e.message())
@@ -82,16 +82,16 @@ class TransactionRepositoryImpl @Inject constructor(
     }
   }
 
-  override suspend fun sendTransaction(transaction: TransactionEntry): NetworkResult<Boolean> {
+  override suspend fun sendTransaction(transaction: TransactionEntry): NetworkResult<String> {
     return if (connectivityService.hasConnection()) {
       val rawTransaction = transaction.transaction.encode(transaction.signatureData).toHexString()
       val resp = ethereumApi.sendRawTransaction(rawTransaction)
       val body = resp.body()
 
       try {
-        if (resp.isSuccessful && body != null) {
+        if (resp.isSuccessful && body != null && body["result"] != null) {
           transactionDao.add(transaction)
-          NetworkResult.Success(true)
+          NetworkResult.Success(body["result"].asString)
         }
         else NetworkResult.Error(resp.code(), resp.message())
       } catch (e: HttpException) {

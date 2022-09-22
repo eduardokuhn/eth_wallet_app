@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
+import com.example.ethwalletapp.data.models.TransactionState
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
+import com.example.ethwalletapp.data.repositories.ITransactionRepository
 import com.example.ethwalletapp.data.services.EthereumNetwork
 import com.example.ethwalletapp.data.services.IAccountService
 import com.example.ethwalletapp.data.services.IEthereumNetworkService
@@ -19,6 +21,7 @@ import javax.inject.Inject
 
 data class WalletViewUIState(
   // WalletView - START
+  val isRefreshing: Boolean = false,
   val selectedNetwork: EthereumNetwork = EthereumNetwork.Rinkeby,
   val accounts: MutableList<AccountEntry> = mutableListOf(),
   val selectedAccount: AccountEntry? = null,
@@ -42,6 +45,7 @@ data class WalletViewUIState(
 
 interface IWalletViewViewModel {
   var uiState: MutableState<WalletViewUIState>
+  suspend fun refreshData()
   fun setSelectedNetwork(network: EthereumNetwork)
   fun isNetworkSelected(network: EthereumNetwork): Boolean
   fun selectAccount(account: AccountEntry, balance: BalanceEntry?)
@@ -53,10 +57,12 @@ interface IWalletViewViewModel {
   suspend fun createNewAccount(): Boolean
   fun setImportAccountPrivateKey(value: String)
   suspend fun importAccount(): Boolean
+  suspend fun getTransactionState(hash: String): TransactionState
 }
 
 class WalletViewViewModelMock : IWalletViewViewModel {
   override var uiState = mutableStateOf(WalletViewUIState())
+  override suspend fun refreshData() {}
   override fun setSelectedNetwork(network: EthereumNetwork) {}
   override fun isNetworkSelected(network: EthereumNetwork): Boolean { return true }
   override fun selectAccount(account: AccountEntry, balance: BalanceEntry?) {}
@@ -68,6 +74,7 @@ class WalletViewViewModelMock : IWalletViewViewModel {
   override suspend fun createNewAccount(): Boolean { return true }
   override fun setImportAccountPrivateKey(value: String) {}
   override suspend fun importAccount(): Boolean { return true }
+  override suspend fun getTransactionState(hash: String): TransactionState { return TransactionState.Confirmed }
 }
 
 @HiltViewModel
@@ -75,16 +82,21 @@ class WalletViewViewModel @Inject constructor(
   private val ethereumNetworkService: IEthereumNetworkService,
   private val accountService: IAccountService,
   private val accountRepository: IAccountRepository,
-  private val balanceRepository: IBalanceRepository
+  private val balanceRepository: IBalanceRepository,
+  private val transactionRepository: ITransactionRepository
 ) : ViewModel(), IWalletViewViewModel {
   override var uiState = mutableStateOf(WalletViewUIState())
 
   init {
-    viewModelScope.launch {
-      loadAccounts()
-      loadBalances()
-      getEthereumLastPrice()
-    }
+    viewModelScope.launch { refreshData() }
+  }
+
+  override suspend fun refreshData() {
+    uiState.value = uiState.value.copy(isRefreshing = true)
+    loadAccounts()
+    loadBalances()
+    getEthereumLastPrice()
+    uiState.value = uiState.value.copy(isRefreshing = false)
   }
 
   override fun setSelectedNetwork(network: EthereumNetwork) {
@@ -218,5 +230,9 @@ class WalletViewViewModel @Inject constructor(
       uiState.value = uiState.value.copy(isImportAccountPrivateKeyValid = false)
       false
     }
+  }
+
+  override suspend fun getTransactionState(hash: String): TransactionState {
+    return transactionRepository.getTransaction(hash).state
   }
 }

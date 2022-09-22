@@ -75,6 +75,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.25.1"
     implementation "com.google.accompanist:accompanist-pager:0.25.1"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.25.1"
     implementation "com.google.accompanist:accompanist-navigation-material:0.25.1"
@@ -92,7 +93,9 @@ dependencies {
     implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
     implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
     implementation "com.github.komputing.kethereum:eip191:$kethereum_version"
+    implementation "com.github.komputing.kethereum:eip155:$kethereum_version"
     implementation "com.github.komputing.kethereum:erc55:$kethereum_version"
+    implementation "com.github.komputing.kethereum:erc681:$kethereum_version"
     implementation "com.github.komputing.kethereum:rlp:$kethereum_version"
     implementation "com.github.komputing.kethereum:extensions_transactions:$kethereum_version"
     implementation "com.github.komputing.kethereum:keccak_shortcut:$kethereum_version"
@@ -112,6 +115,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.1")
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"

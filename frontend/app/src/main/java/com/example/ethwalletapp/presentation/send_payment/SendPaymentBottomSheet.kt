@@ -88,8 +88,14 @@ fun SendPaymentBottomSheet(
             onClose = { navController?.popBackStack() },
             onSend = {
               scope.launch {
-                val ok = viewModel.sendTransaction()
-                if (ok) navController?.popBackStack()
+                val txHash = viewModel.sendTransaction()
+                if (txHash != null) {
+                  navController
+                    ?.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("transactionHash", txHash)
+                  navController?.popBackStack()
+                }
               }
             }
           )

@@ -31,6 +31,9 @@ val Gray23 = Color(0xFF101419)
 val Gray24 = Color(0xFF080A0C)
 
 val Green5 = Color(0xFF76E268)
+val Green6 = Color(0xFF50C24C)
+val Green7 = Color(0xFF34A239)
+val Green8 = Color(0xFF21832D)
 
 // Red
 val Red3 = Color(0xFFF5A3A7)
@@ -40,10 +43,13 @@ val Red7 = Color(0xFFCB151E)
 val Red8 = Color(0xFF941016)
 
 val Blue5 = Color(0xFF5F97FF)
+val Blue6 = Color(0xFF517DDB)
+val Blue7 = Color(0xff385BB7)
 
 // Yellow
 val Yellow4 = Color(0xFFFFE243)
 val Yellow5 = Color(0xFFFFD505)
+val Yellow8 = Color(0xFF937301)
 
 val Turquoise5 = Color(0xFF45F0D1)
 

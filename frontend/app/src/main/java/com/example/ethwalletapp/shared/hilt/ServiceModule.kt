@@ -39,10 +39,15 @@ object ServiceModule {
 
   @Provides
   fun provideTransactionServiceImpl(
+    keyStore: KeyStore,
+    @Named("encryptedSharedPreferences")
+    encryptedSharedPreferences: SharedPreferences,
     ethereumNetworkService: IEthereumNetworkService,
     transactionRepository: ITransactionRepository
   ): ITransactionService {
     return TransactionServiceImpl(
+      keyStore = keyStore,
+      encryptedSharedPreferences = encryptedSharedPreferences,
       ethereumNetworkService = ethereumNetworkService,
       transactionRepository = transactionRepository
     )

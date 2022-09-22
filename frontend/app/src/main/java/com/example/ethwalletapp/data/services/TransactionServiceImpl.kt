@@ -1,5 +1,6 @@
 package com.example.ethwalletapp.data.services
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.TransactionEntry
@@ -8,25 +9,18 @@ import com.example.ethwalletapp.data.repositories.ITransactionRepository
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import org.kethereum.DEFAULT_GAS_LIMIT
 import org.kethereum.DEFAULT_GAS_PRICE
-import org.kethereum.extensions.transactions.encode
-import org.kethereum.extensions.transactions.toTransaction
-import org.kethereum.extensions.transactions.toTransactionSignatureData
+import org.kethereum.eip155.signViaEIP155
+import org.kethereum.erc681.ERC681
+import org.kethereum.extensions.transactions.*
 import org.kethereum.keccakshortcut.keccak
+import org.kethereum.keystore.api.KeyStore
 import org.kethereum.model.ChainId
-import org.kethereum.model.SignatureData
-import org.kethereum.model.Transaction
 import org.kethereum.model.createTransactionWithDefaults
-import org.kethereum.rlp.RLPList
-import org.kethereum.rlp.RLPType
-import org.kethereum.rlp.decodeRLP
 import org.kethereum.rlp.encode
-import org.komputing.khex.extensions.hexToByteArray
 import org.komputing.khex.extensions.toHexString
-import org.komputing.khex.model.HexString
 import java.math.BigInteger
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 /*
@@ -43,56 +37,54 @@ interface ITransactionService {
   suspend fun createTransaction(
     from: AccountEntry,
     to: AccountEntry,
-    value: Double
+    value: BigInteger
   ): TransactionEntry?
 }
 
 @Singleton
 class TransactionServiceImpl @Inject constructor(
+  private val keyStore: KeyStore,
+  @Named("encryptedSharedPreferences")
+  private val encryptedSharedPreferences: SharedPreferences,
   private val ethereumNetworkService: IEthereumNetworkService,
   private val transactionRepository: ITransactionRepository
 ) : ITransactionService {
   override suspend fun createTransaction(
     from: AccountEntry,
     to: AccountEntry,
-    value: Double
+    value: BigInteger
   ): TransactionEntry? {
     val nonceResult = transactionRepository.getAddressNonce(from.address)
+    val chainId = ChainId(ethereumNetworkService.selectedNetwork.chainId())
 
     return if (nonceResult is NetworkResult.Success) {
       // Creates transaction data structure
-      val transactionDataStructure = createTransactionWithDefaults(
-        chain = ChainId(ethereumNetworkService.selectedNetwork.chainId()),
-        creationEpochSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+      val transaction = createTransactionWithDefaults(
         from = from.address,
         to = to.address,
-        value = BigInteger.valueOf(value.toLong()),
-        gasLimit = DEFAULT_GAS_LIMIT,
+        // TODO always 0
+        value = value,
+        chain = chainId,
+        creationEpochSecond = System.currentTimeMillis() / 1000,
+        nonce = nonceResult.data,
         gasPrice = DEFAULT_GAS_PRICE,
-        nonce = nonceResult.data
+        gasLimit = DEFAULT_GAS_LIMIT
       )
 
       try {
-        // Encodes transaction data structure with RLP and returns the RLP serialized message
-        val transactionRLP = HexString(transactionDataStructure.encode().toHexString()).hexToByteArray()
-        val transactionRLPList = transactionRLP.decodeRLP() as RLPList
-        require(transactionRLPList.element.size == 9) { "RLP list has the wrong size ${transactionRLPList.element.size} != 9" }
-
-        val signatureData = transactionRLPList.toTransactionSignatureData()
-        val transaction = transactionRLPList.toTransaction()?.apply {
-          txHash = transactionRLPList.encode().keccak().toHexString()
+        val password = encryptedSharedPreferences.getString("password", "")
+        val signatureData = keyStore.getKeyForAddress(from.address, password = password!!)?.let {
+          transaction.signViaEIP155(it, chainId)
         }
+        val txHash = transaction.encode(signatureData).keccak().toHexString()
+        transaction.txHash = txHash
 
-        val transactionState = TransactionState.Pending
-
-        if (transaction?.txHash != null) {
-          TransactionEntry(
-            hash = transaction.txHash!!,
-            transaction = transaction,
-            signatureData = signatureData,
-            state = transactionState
-          )
-        } else null
+        TransactionEntry(
+          hash = transaction.txHash!!,
+          transaction = transaction,
+          signatureData = signatureData,
+          state = TransactionState.Pending
+        )
       } catch (e: Exception) {
         Log.e("TransactionServiceImpl.createTransaction", "Exception: $e")
         null

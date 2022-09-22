@@ -12,14 +12,17 @@ import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import com.example.ethwalletapp.data.repositories.ITransactionRepository
 import com.example.ethwalletapp.data.services.IAccountService
 import com.example.ethwalletapp.data.services.ITransactionService
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import com.example.ethwalletapp.shared.utils.ViewState
+import com.example.ethwalletapp.shared.utils.gweiToEther
+import com.example.ethwalletapp.shared.utils.weiToEther
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.kethereum.DEFAULT_GAS_LIMIT
 import org.kethereum.model.Address
+import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 import javax.inject.Inject
 
 data class SendPaymentBottomSheetUIState(
@@ -45,10 +48,9 @@ data class SendPaymentBottomSheetUIState(
   // AmountView - END
 
   // ConfirmView - START
-  // TODO bug
-  val networkFeeInEther: BigInteger = EthereumUnitConverter.gweiToEther(DEFAULT_GAS_LIMIT * BigInteger.valueOf(200)),
-  val totalValueInEther: BigInteger? = valueInputInEther?.let { BigInteger.valueOf(it.toLong()) + networkFeeInEther },
-  val totalValueInUsd: Double? = ethUsdPrice?.let { totalValueInEther?.toDouble()?.times(it) },
+  val networkFeeInEther: BigDecimal = (DEFAULT_GAS_LIMIT * BigInteger("200")).gweiToEther(),
+  val totalValueInEther: Double? = 0.0,
+  val totalValueInUsd: Double? = 0.0,
   val confirmViewState: ViewState = ViewState.Unknown
   // ConfirmView - END
 )
@@ -71,7 +73,7 @@ interface ISendPaymentBottomSheetViewModel {
   // AmountView - END
 
   // ConfirmView - START
-  suspend fun sendTransaction(): Boolean
+  suspend fun sendTransaction(): String?
   // ConfirmView - END
 }
 
@@ -86,7 +88,7 @@ class SendPaymentBottomSheetViewModelMock : ISendPaymentBottomSheetViewModel {
   override fun setValueInput(value: String) {}
   override fun toggleIsValueInputInUsd() {}
   override fun useMax() {}
-  override suspend fun sendTransaction(): Boolean { return true }
+  override suspend fun sendTransaction(): String? { return "" }
 }
 
 @HiltViewModel
@@ -214,16 +216,24 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
   }
 
   override fun setValueInput(value: String) {
+    val networkFeeInUsd = uiState.value.networkFeeInEther.divide(uiState.value.ethUsdPrice?.toBigDecimal(), 4, RoundingMode.HALF_EVEN)
+
     if (uiState.value.isValueInputInUsd) {
+      val valueInputInEther = uiState.value.ethUsdPrice?.let { value.toDoubleOrNull()?.div(it) }
       uiState.value = uiState.value.copy(
-        valueInputInEther = uiState.value.ethUsdPrice?.let { value.toDoubleOrNull()?.div(it) },
+        valueInputInEther = valueInputInEther,
         valueInputInUsd = value.toDoubleOrNull(),
+        totalValueInEther = valueInputInEther?.let { it.toBigDecimal().plus(uiState.value.networkFeeInEther) }?.toDouble(),
+        totalValueInUsd = value.toBigDecimalOrNull()?.plus(networkFeeInUsd)?.toDouble(),
         valueInput = value
       )
     } else {
+      val valueValueInUsd = uiState.value.ethUsdPrice?.let { value.toDoubleOrNull()?.times(it) }
       uiState.value = uiState.value.copy(
         valueInputInEther = value.toDoubleOrNull(),
-        valueInputInUsd = uiState.value.ethUsdPrice?.let { value.toDoubleOrNull()?.times(it) },
+        valueInputInUsd = valueValueInUsd,
+        totalValueInEther = value.toBigDecimalOrNull()?.plus(uiState.value.networkFeeInEther)?.toDouble(),
+        totalValueInUsd = valueValueInUsd?.let { it.toBigDecimal().plus(networkFeeInUsd) }?.toDouble(),
         valueInput = value
       )
     }
@@ -236,25 +246,29 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
       isValueInputInUsd = isInUsd,
       valueInput =
         if (!isInUsd) uiState.value.valueInputInEther.toString()
-        else uiState.value.valueInputInUsd.toString(),
+        else uiState.value.valueInputInUsd?.toBigDecimal()?.setScale(2, RoundingMode.HALF_EVEN).toString(),
     )
   }
 
   override fun useMax() {
-    val maxEther = EthereumUnitConverter.weiToEther(
-      uiState.value.fromAccountBalance?.balance ?: BigInteger.valueOf(0)
-    ).toDouble()
+    val networkFeeInUsd = uiState.value.networkFeeInEther.divide(uiState.value.ethUsdPrice?.toBigDecimal(), 4, RoundingMode.HALF_EVEN)
+    val maxEther = uiState.value.fromAccountBalance?.balance?.weiToEther()
+
+    val valueInputInUsd = uiState.value.ethUsdPrice?.let { maxEther?.times(it.toBigDecimal()) }
 
     uiState.value = uiState.value.copy(
-      valueInputInEther = maxEther,
-      valueInputInUsd = uiState.value.ethUsdPrice?.let { maxEther.times(it) },
+      valueInputInEther = maxEther?.toDouble(),
+      valueInputInUsd = valueInputInUsd?.toDouble(),
+      totalValueInEther = maxEther?.plus(uiState.value.networkFeeInEther)?.toDouble(),
+      totalValueInUsd = valueInputInUsd?.plus(networkFeeInUsd)?.toDouble(),
       valueInput =
         if (!uiState.value.isValueInputInUsd) maxEther.toString()
-        else (uiState.value.ethUsdPrice?.let { maxEther.div(it) }).toString()
+        else uiState.value.ethUsdPrice?.let { maxEther?.times(BigDecimal(it)) }?.setScale(2, RoundingMode.HALF_EVEN).toString()
+
     )
   }
 
-  override suspend fun sendTransaction(): Boolean {
+  override suspend fun sendTransaction(): String? {
    uiState.value = uiState.value.copy(confirmViewState = ViewState.Loading)
 
     return if (
@@ -266,7 +280,7 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
       val transaction = transactionService.createTransaction(
         from = uiState.value.fromAccount!!,
         to = uiState.value.toAccount!!,
-        value = uiState.value.valueInputInEther!!
+        value = uiState.value.valueInputInEther!!.toBigDecimal().toBigInteger()
       )
 
       if (transaction != null) {
@@ -274,18 +288,18 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
 
         if (result is NetworkResult.Success) {
           uiState.value.copy(confirmViewState = ViewState.Success)
-          true
+          result.data
         } else {
           uiState.value = uiState.value.copy(confirmViewState = ViewState.Error)
-          false
+          null
         }
       } else {
         uiState.value = uiState.value.copy(confirmViewState = ViewState.Error)
-        false
+        null
       }
     } else {
-      uiState.value = uiState.value.copy(confirmViewState = ViewState.Unknown)
-      false
+      uiState.value = uiState.value.copy(confirmViewState = ViewState.Error)
+      null
     }
   }
 
@@ -293,7 +307,7 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
     if (uiState.value.valueInputInEther != null && uiState.value.fromAccountBalance != null) {
       if (
         uiState.value.valueInputInEther!! >
-        EthereumUnitConverter.weiToEther(uiState.value.fromAccountBalance!!.balance).toDouble()
+        uiState.value.fromAccountBalance!!.balance.weiToEther().toDouble()
       ) {
         uiState.value = uiState.value.copy(hasSufficientFunds = false)
       } else {

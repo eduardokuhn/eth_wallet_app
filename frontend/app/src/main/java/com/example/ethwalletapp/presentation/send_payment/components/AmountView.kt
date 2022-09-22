@@ -38,9 +38,10 @@ import com.example.ethwalletapp.shared.theme.Blue5
 import com.example.ethwalletapp.shared.theme.Gradient07
 import com.example.ethwalletapp.shared.theme.Gray22
 import com.example.ethwalletapp.shared.utils.Constant
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
+import com.example.ethwalletapp.shared.utils.weiToEther
 import org.kethereum.model.Address
 import java.math.BigInteger
+import java.math.RoundingMode
 
 @Composable
 fun AmountView(
@@ -169,7 +170,9 @@ fun AmountView(
       Spacer(Modifier.height(26.dp))
       SecondaryButton(
         onClick = toggleIsValueInputInUsd,
-        text = if (!isValueInputInUsd) "$${valueInputInUsd ?: "__,__"}" else "${valueInputInEther ?: "__.__"} ETH",
+        text =
+          if (!isValueInputInUsd) "$${valueInputInUsd?.toBigDecimal()?.setScale(2, RoundingMode.HALF_EVEN) ?: "__,__"}"
+          else "${valueInputInEther?.toBigDecimal()?.setScale(5, RoundingMode.HALF_EVEN) ?: "__.__"} ETH",
         fontWeight = FontWeight.Normal,
         trailingIcon = {
           Icon(
@@ -182,7 +185,7 @@ fun AmountView(
       )
       Spacer(Modifier.height(20.dp))
       Text(
-        text = "Balance: ${EthereumUnitConverter.weiToEther(fromAccountBalance?.balance ?: BigInteger.valueOf(0))} ETH",
+        text = "Balance: ${fromAccountBalance?.balance?.weiToEther() ?: "__.__"} ETH",
         fontSize = 16.sp,
         color = Color.White
       )

@@ -22,7 +22,8 @@ import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.utils.Constant
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
+import com.example.ethwalletapp.shared.utils.weiToEther
+
 import org.kethereum.model.Address
 import java.math.BigInteger
 
@@ -65,7 +66,7 @@ fun AccountListItem(
         text =
           if (showAddress) account.address.hex
           else {
-            if (balance != null) "${EthereumUnitConverter.weiToEther(balance.balance)} ETH"
+            if (balance != null) "${balance.balance.weiToEther()} ETH"
             else "__.__ ETH"
           },
         fontSize = 12.sp,

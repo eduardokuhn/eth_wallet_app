@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.ChangeCircle
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,27 +21,34 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.example.ethwalletapp.R
+import com.example.ethwalletapp.data.models.TransactionState
 import com.example.ethwalletapp.presentation.home.wallet.components.AccountBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.NetworkBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.ReceivePaymentBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.TokenListItem
 import com.example.ethwalletapp.shared.components.ErrorBanner
 import com.example.ethwalletapp.shared.components.SecondaryButton
+import com.example.ethwalletapp.shared.components.SubmittedBanner
 import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.Gradient07
 import com.example.ethwalletapp.shared.theme.Gray24
 import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.theme.Primary5
-import com.example.ethwalletapp.shared.utils.EthereumUnitConverter
 import com.example.ethwalletapp.shared.utils.ViewState
+import com.example.ethwalletapp.shared.utils.weiToEther
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 sealed class WalletViewBottomSheetContent() {
@@ -57,6 +65,7 @@ fun WalletView(
   setShowTabBar: (value: Boolean) -> Unit
 ) {
   val uiState = viewModel.uiState.value
+
   var currentBottomSheetContent: WalletViewBottomSheetContent? by remember {
     mutableStateOf(null)
   }
@@ -68,9 +77,12 @@ fun WalletView(
       it != ModalBottomSheetValue.HalfExpanded
     }
   )
+
   val scope = rememberCoroutineScope()
 
   val clipboardManager = LocalClipboardManager.current
+
+  val snackbarHostState = remember { SnackbarHostState() }
 
   fun openSheet(content: WalletViewBottomSheetContent) {
     currentBottomSheetContent = content
@@ -85,8 +97,6 @@ fun WalletView(
   }
 
   BoxWithConstraints(Modifier.fillMaxSize()) {
-    // TODO apply it
-    val modalHeight = (maxHeight / 1.5.dp).dp
     ModalBottomSheetLayout(
       sheetState = sheetState,
       sheetContent = {
@@ -222,7 +232,7 @@ fun WalletView(
             Text(
               text =
                 if (uiState.selectedAccountBalance != null)
-                  "${EthereumUnitConverter.weiToEther(uiState.selectedAccountBalance.balance)} ETH"
+                  "${uiState.selectedAccountBalance.balance.weiToEther()} ETH"
                 else "__.__ ETH",
               fontSize = 40.sp,
               fontWeight = FontWeight.SemiBold,
@@ -245,7 +255,6 @@ fun WalletView(
             Spacer(Modifier.height(28.dp))
             Row {
               SecondaryButton(
-                // TODO receive bool if with transaction status
                 onClick = { navController?.navigate("${Screen.SendPaymentBottomSheet.route}/${uiState.selectedAccount?.address?.hex}") },
                 text = "Send",
                 leadingIcon = {
@@ -287,14 +296,26 @@ fun WalletView(
               icon = painterResource(R.drawable.ic_ethereum),
               name = "Ethereum",
               abbr = "ETH",
-              value = uiState.ethUsdPrice,
-              balance = uiState.selectedAccountBalance?.balance?.let {
-                EthereumUnitConverter.weiToEther(it)
-              }
+              tokenPrice = uiState.ethUsdPrice,
+              balance = uiState.selectedAccountBalance?.balance,
+              onClick = { navController?.navigate("${Screen.TokenOverview.route}/${uiState.selectedAccount?.address?.hex}") },
             )
           }
         } else CircularProgressIndicator(color = Primary5)
       }
+      SnackbarHost(
+        hostState = snackbarHostState,
+        snackbar = { snackData ->
+          when (snackData.message) {
+            "Pending" -> SubmittedBanner(
+              title = "Transaction Submitted",
+              description = "Waiting for confirmation"
+            )
+            "Success" -> {}
+            "Failed" -> {}
+          }
+        }
+      )
     }
   }
 }

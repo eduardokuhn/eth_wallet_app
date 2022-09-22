@@ -2,11 +2,16 @@ package com.example.ethwalletapp.data.data_sources.daos
 
 import androidx.room.*
 import com.example.ethwalletapp.data.models.AccountEntry
+import com.example.ethwalletapp.data.models.BalanceEntry
+import org.kethereum.model.Address
 
 @Dao
 interface AccountDao {
   @Query("SELECT * FROM account")
   suspend fun all(): List<AccountEntry>
+
+  @Query("SELECT * FROM account WHERE address LIKE :address")
+  suspend fun account(address: Address): AccountEntry
 
   @Query("SELECT COUNT(address) FROM account")
   suspend fun count(): Int

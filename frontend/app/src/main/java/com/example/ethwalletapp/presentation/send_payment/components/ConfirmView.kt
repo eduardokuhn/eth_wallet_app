@@ -3,7 +3,9 @@ package com.example.ethwalletapp.presentation.send_payment.components
 import PrimaryButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -28,8 +30,11 @@ import com.example.ethwalletapp.shared.components.ErrorBanner
 import com.example.ethwalletapp.shared.theme.*
 import com.example.ethwalletapp.shared.utils.Constant
 import com.example.ethwalletapp.shared.utils.ViewState
+import org.kethereum.DEFAULT_GAS_LIMIT
 import org.kethereum.model.Address
+import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 @Composable
 fun ConfirmView(
@@ -38,14 +43,17 @@ fun ConfirmView(
   fromAccount: AccountEntry?,
   fromAccountBalance: BalanceEntry?,
   toAccount: AccountEntry?,
-  networkFeeInEther: BigInteger,
-  totalValueInEther: BigInteger?,
+  networkFeeInEther: BigDecimal?,
+  totalValueInEther: Double?,
   totalValueInUsd: Double?,
   onBack: () -> Unit,
   onClose: () -> Unit,
   onSend: () -> Unit
 ) {
-  Column(Modifier.fillMaxSize()) {
+  Column(
+    Modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState())) {
     if (confirmViewState is ViewState.Error) {
       ErrorBanner(
         title = "Error! Retry it again",
@@ -101,7 +109,7 @@ fun ConfirmView(
       )
       Spacer(Modifier.height(14.dp))
       Text(
-        text = "${valueInputInEther?.toString() ?: "__.__"} ETH",
+        text = "${valueInputInEther ?: "__.__"} ETH",
         fontSize = 40.sp,
         textAlign = TextAlign.Center,
         maxLines = 1,
@@ -160,7 +168,7 @@ fun ConfirmView(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                  text = "${valueInputInEther?.toString() ?: "__.__"} ETH",
+                  text = "${valueInputInEther ?: "__.__"} ETH",
                   fontSize = 13.sp,
                   color = Color.White,
                   textAlign = TextAlign.End,
@@ -176,7 +184,7 @@ fun ConfirmView(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                  text = "$networkFeeInEther ETH",
+                  text = "${networkFeeInEther ?: "__.__"} ETH",
                   fontSize = 13.sp,
                   color = Color.White,
                   textAlign = TextAlign.End,
@@ -195,7 +203,7 @@ fun ConfirmView(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                  text = "${totalValueInEther?.toDouble() ?: "__.__"} ETH",
+                  text = "${totalValueInEther ?: "__.__"} ETH",
                   fontSize = 18.sp,
                   fontWeight = FontWeight.SemiBold,
                   color = Color.White,
@@ -205,7 +213,7 @@ fun ConfirmView(
               }
               Spacer(Modifier.height(12.dp))
               Text(
-                text = "$${totalValueInUsd ?: "__,__"}",
+                text = "$${totalValueInUsd?.toBigDecimal()?.setScale(2, RoundingMode.HALF_EVEN) ?: "__,__"}",
                 fontSize = 12.sp,
                 color = Gray12,
                 textAlign = TextAlign.End,
@@ -216,8 +224,8 @@ fun ConfirmView(
         }
         Spacer(
           Modifier
-            .weight(1f)
-            .height(52.dp))
+            .height(52.dp)
+            .weight(1f))
         PrimaryButton(
           onClick = { if (confirmViewState !is ViewState.Loading) onSend() },
           text = "Send",
@@ -234,7 +242,7 @@ fun ConfirmView(
 private fun ConfirmViewPreview() {
   ConfirmView(
     confirmViewState = ViewState.Loading,
-    valueInputInEther = 0.2,
+    valueInputInEther = 0.0,
     fromAccount = AccountEntry(
       address = Address("0x71C7656EC7ab88b098defB751B7401B5f6d8976F"),
       name = "Account 1",
@@ -251,8 +259,8 @@ private fun ConfirmViewPreview() {
       name = "Account 2",
       addressIndex = 0
     ),
-    networkFeeInEther =  BigInteger("000042"),
-    totalValueInEther = BigInteger("02"),
+    networkFeeInEther =  BigDecimal("0"),
+    totalValueInEther = 2.0,
     totalValueInUsd = 100.0,
     onBack = {},
     onClose = {},

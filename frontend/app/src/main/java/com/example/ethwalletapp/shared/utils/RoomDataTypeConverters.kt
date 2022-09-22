@@ -2,6 +2,7 @@ package com.example.ethwalletapp.shared.utils
 
 import androidx.room.TypeConverter
 import org.kethereum.model.Address
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 

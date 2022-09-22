@@ -11,7 +11,7 @@ interface IEthereumApi {
   suspend fun balances(addresses: String): Response<JsonObject>
   suspend fun transactionReceiptStatus(hash: String): Response<JsonObject>
   suspend fun transactionCount(address: String): Response<JsonObject>
-  suspend fun sendRawTransaction(transaction: String): Response<JsonObject>
+  suspend fun sendRawTransaction(hex: String): Response<JsonObject>
 }
 
 interface EtherscanApi : IEthereumApi {
@@ -32,5 +32,5 @@ interface EtherscanApi : IEthereumApi {
 
   @FormUrlEncoded
   @POST("api?module=proxy&action=eth_sendRawTransaction&apikey=${Env.ETHERSCAN_API_TOKEN}")
-  override suspend fun sendRawTransaction(@Field("hex") transaction: String): Response<JsonObject>
+  override suspend fun sendRawTransaction(@Field("hex") hex: String): Response<JsonObject>
 }
