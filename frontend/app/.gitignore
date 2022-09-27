@@ -1,2 +1,2 @@
 /build
-/main/java/com/example/ethwalletapp/shared/utils/Env.kt
+/src/main/java/com/example/ethwalletapp/shared/utils/Env.kt

@@ -1,15 +1,20 @@
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.ethwalletapp.R
 import com.example.ethwalletapp.shared.components.SecondaryButton
 import com.example.ethwalletapp.shared.navigation.Screen
 import com.example.ethwalletapp.shared.theme.Gray24
@@ -28,6 +33,14 @@ fun StartScreen(navController: NavController?) {
         .fillMaxSize()
         .padding(horizontal = 24.dp)
     ) {
+      Box(Modifier.weight(1f)) {
+        Icon(
+          painterResource(id = R.drawable.ic_app_logo),
+          contentDescription = "Logo",
+          tint = Color.Unspecified,
+          modifier = Modifier.align(Alignment.Center).size(250.dp)
+        )
+      }
       Text(
         text = "Wallet Setup",
         fontWeight = FontWeight.SemiBold,

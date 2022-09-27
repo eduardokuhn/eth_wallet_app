@@ -2,7 +2,6 @@ package com.example.ethwalletapp.presentation.settings
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
-import androidx.room.CoroutinesRoom
 import com.example.ethwalletapp.data.data_sources.LocalAppDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.kethereum.keystore.api.KeyStore
