@@ -12,6 +12,9 @@ interface BalanceDao {
   @Query("SELECT * FROM balance WHERE address IN (:addresses)")
   suspend fun balances(addresses: List<Address>): List<BalanceEntry>
 
+  @Query("DELETE FROM balance")
+  suspend fun deleteAll()
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun add(balance: BalanceEntry)
 

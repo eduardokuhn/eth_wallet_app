@@ -12,10 +12,7 @@ import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import com.example.ethwalletapp.data.repositories.ITransactionRepository
 import com.example.ethwalletapp.data.services.IAccountService
 import com.example.ethwalletapp.data.services.ITransactionService
-import com.example.ethwalletapp.shared.utils.NetworkResult
-import com.example.ethwalletapp.shared.utils.ViewState
-import com.example.ethwalletapp.shared.utils.gweiToEther
-import com.example.ethwalletapp.shared.utils.weiToEther
+import com.example.ethwalletapp.shared.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.kethereum.DEFAULT_GAS_LIMIT
@@ -280,7 +277,7 @@ class SendPaymentBottomSheetViewModel @Inject constructor(
       val transaction = transactionService.createTransaction(
         from = uiState.value.fromAccount!!,
         to = uiState.value.toAccount!!,
-        value = uiState.value.valueInputInEther!!.toBigDecimal().toBigInteger()
+        value = uiState.value.valueInputInEther!!.toBigDecimal().etherToWei()
       )
 
       if (transaction != null) {

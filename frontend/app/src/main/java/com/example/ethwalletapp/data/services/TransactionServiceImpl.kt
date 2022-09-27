@@ -62,10 +62,9 @@ class TransactionServiceImpl @Inject constructor(
       val transaction = createTransactionWithDefaults(
         from = from.address,
         to = to.address,
-        // TODO always 0
         value = value,
         chain = chainId,
-        creationEpochSecond = System.currentTimeMillis() / 1000,
+        creationEpochSecond = System.currentTimeMillis(),
         nonce = nonceResult.data,
         gasPrice = DEFAULT_GAS_PRICE,
         gasLimit = DEFAULT_GAS_LIMIT

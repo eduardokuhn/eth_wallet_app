@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.ethwalletapp.presentation.home.wallet.WalletView
 import com.example.ethwalletapp.presentation.home.wallet.WalletViewViewModel
 import com.example.ethwalletapp.presentation.settings.SettingsView
+import com.example.ethwalletapp.presentation.settings.SettingsViewViewModel
 import com.example.ethwalletapp.shared.theme.Gradient06
 import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Gray24
@@ -94,7 +95,10 @@ private fun ColumnScope.TabContent(
         val viewModel: WalletViewViewModel = hiltViewModel()
         WalletView(navController, viewModel, setShowTabBar)
       }
-      1 -> SettingsView()
+      1 -> {
+        val viewModel: SettingsViewViewModel = hiltViewModel()
+        SettingsView(navController, viewModel)
+      }
     }
   }
 }

@@ -222,10 +222,7 @@ fun ConfirmView(
             }
           }
         }
-        Spacer(
-          Modifier
-            .height(52.dp)
-            .weight(1f))
+        Spacer(Modifier.height(52.dp))
         PrimaryButton(
           onClick = { if (confirmViewState !is ViewState.Loading) onSend() },
           text = "Send",

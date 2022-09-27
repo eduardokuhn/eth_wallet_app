@@ -1,21 +1,26 @@
 package com.example.ethwalletapp.presentation.token_overview
 
-import android.view.View
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.example.ethwalletapp.data.data_sources.TransactionsPagingSource
 import com.example.ethwalletapp.data.models.AccountEntry
 import com.example.ethwalletapp.data.models.BalanceEntry
 import com.example.ethwalletapp.data.models.TransactionEntry
 import com.example.ethwalletapp.data.repositories.IAccountRepository
 import com.example.ethwalletapp.data.repositories.IBalanceRepository
 import com.example.ethwalletapp.data.repositories.ITransactionRepository
-import com.example.ethwalletapp.data.services.IEthereumNetworkService
 import com.example.ethwalletapp.shared.utils.NetworkResult
 import com.example.ethwalletapp.shared.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.kethereum.model.Address
 import javax.inject.Inject
@@ -24,7 +29,7 @@ data class TokenOverviewUIState(
   val selectedAccount: AccountEntry? = null,
   val selectedAccountBalance: BalanceEntry? = null,
   val ethUsdPrice: Double? = 0.0,
-  val transactions: MutableList<TransactionEntry> = mutableListOf(),
+  val transactions: Flow<PagingData<TransactionEntry>> = MutableStateFlow(PagingData.empty()),
   val viewState: ViewState = ViewState.Unknown,
 )
 
@@ -40,7 +45,6 @@ class TokenOverviewViewModelMock : ITokenOverviewViewModel {
 
 @HiltViewModel
 class TokenOverviewViewModel @Inject constructor(
-  private val ethereumNetworkService: IEthereumNetworkService,
   private val accountRepository: IAccountRepository,
   private val balanceRepository: IBalanceRepository,
   private val transactionRepository: ITransactionRepository,
@@ -53,8 +57,8 @@ class TokenOverviewViewModel @Inject constructor(
   override suspend fun refreshData() {
     loadAccount()
     loadBalance()
-    loadTransactions()
     getEthereumLastPrice()
+    loadTransactions()
   }
 
   private suspend fun loadAccount() {
@@ -86,20 +90,15 @@ class TokenOverviewViewModel @Inject constructor(
     } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
   }
 
-  private suspend fun loadTransactions() {
-    uiState.value = uiState.value.copy(viewState = ViewState.Loading)
-
-    if (uiState.value.selectedAccount != null) {
-      val transactions = transactionRepository.getAddressTransactions(
-        address = uiState.value.selectedAccount!!.address,
-        chainId = ethereumNetworkService.selectedNetwork.chainId()
-      ).toMutableList()
-
-      uiState.value = uiState.value.copy(
-        transactions = transactions,
-        viewState = ViewState.Success
+  private fun loadTransactions() {
+    val transactions = Pager(PagingConfig(pageSize = 1)) {
+      TransactionsPagingSource(
+        transactionRepository,
+        uiState.value.selectedAccount?.address ?: Address("")
       )
-    } else uiState.value = uiState.value.copy(viewState = ViewState.Error)
+    }.flow.cachedIn(viewModelScope)
+
+    uiState.value = uiState.value.copy(transactions = transactions)
   }
 
   private suspend fun getEthereumLastPrice() {

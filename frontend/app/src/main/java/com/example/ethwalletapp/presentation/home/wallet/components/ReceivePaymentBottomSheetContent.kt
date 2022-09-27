@@ -1,4 +1,4 @@
-package com.example.ethwalletapp.presentation.home.wallet.components
+ package com.example.ethwalletapp.presentation.home.wallet.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon

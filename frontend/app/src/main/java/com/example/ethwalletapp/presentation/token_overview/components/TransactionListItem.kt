@@ -19,6 +19,8 @@ import com.example.ethwalletapp.shared.theme.Blue6
 import com.example.ethwalletapp.shared.theme.Gray12
 import com.example.ethwalletapp.shared.theme.Green6
 import com.example.ethwalletapp.shared.theme.Red6
+import com.example.ethwalletapp.shared.utils.toDateTime
+import com.example.ethwalletapp.shared.utils.weiToEther
 
 @Composable
 fun TransactionListItem(
@@ -26,14 +28,17 @@ fun TransactionListItem(
   transaction: TransactionEntry,
   valueInUsd: String
 ) {
-  Column(Modifier.padding(vertical = 16.dp)) {
+  Column {
     Text(
-      text = transaction.transaction.creationEpochSecond.toString(),
+      text = transaction.transaction.creationEpochSecond?.toDateTime() ?: "yyyy.MM.dd HH:mm",
       fontSize = 12.sp,
       color = Gray12
     )
     Spacer(Modifier.height(10.dp))
-    Row(Modifier.fillMaxWidth()) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth()
+    ) {
       Icon(
         if (isSentTransaction) Icons.Outlined.Send else Icons.Outlined.Wallet,
         contentDescription = if (isSentTransaction) "Sent transaction"  else "Received transaction",
@@ -44,7 +49,7 @@ fun TransactionListItem(
       Column {
         Row {
           Text(
-            text = if (isSentTransaction) "Received ETH" else "Sent ETH",
+            text = if (isSentTransaction) "Sent ETH" else "Received ETH",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White
@@ -54,7 +59,7 @@ fun TransactionListItem(
               .height(8.dp)
               .weight(1f))
           Text(
-            text = "${transaction.transaction.value?.toBigDecimal() ?: "__.__"} ETH",
+            text = "${transaction.transaction.value?.weiToEther() ?: "__.__"} ETH",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White

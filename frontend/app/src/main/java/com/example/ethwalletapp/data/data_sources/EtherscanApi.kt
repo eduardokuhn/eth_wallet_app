@@ -9,6 +9,7 @@ interface IEthereumApi {
   suspend fun price(): Response<JsonObject>
   suspend fun balance(address: String): Response<JsonObject>
   suspend fun balances(addresses: String): Response<JsonObject>
+  suspend fun transactions(address: String, page: Int?): Response<JsonObject>
   suspend fun transactionReceiptStatus(hash: String): Response<JsonObject>
   suspend fun transactionCount(address: String): Response<JsonObject>
   suspend fun sendRawTransaction(hex: String): Response<JsonObject>
@@ -23,6 +24,9 @@ interface EtherscanApi : IEthereumApi {
 
   @GET("api?module=account&action=balancemulti&tag=latest&apikey=${Env.ETHERSCAN_API_TOKEN}")
   override suspend fun balances(@Query("address") addresses: String): Response<JsonObject>
+
+  @GET("api?module=account&action=txlist&startblock=0&endblock=99999999&offset=10&sort=desc&apikey=${Env.ETHERSCAN_API_TOKEN}")
+  override suspend fun transactions(@Query("address") address: String, @Query("page") page: Int?): Response<JsonObject>
 
   @GET("api?module=transaction&action=gettxreceiptstatus&apikey=${Env.ETHERSCAN_API_TOKEN}")
   override suspend fun transactionReceiptStatus(@Query("txhash") hash: String): Response<JsonObject>

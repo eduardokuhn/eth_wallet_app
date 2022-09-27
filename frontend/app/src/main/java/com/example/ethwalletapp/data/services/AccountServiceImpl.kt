@@ -166,17 +166,6 @@ class AccountServiceImpl @Inject constructor(
     }
   }
 
-  // TODO do
-  suspend fun importChildAccount(secretRecoveryPhrase: String, password: String) {
-    repeat(9) { addressIndex ->
-      val mnemonicWords: MnemonicWords = dirtyPhraseToMnemonicWords(secretRecoveryPhrase)
-      var path: String = DEFAULT_ETHEREUM_BIP44_PATH
-      path = path.substring(0, 15) + addressIndex.toString()
-      val childKey: ExtendedKey = mnemonicWords.toKey(path, saltPhrase)
-      keyStore.addKey(childKey.keyPair, password, true)
-    }
-  }
-
   override suspend fun hasAccount(): Boolean {
     return accountRepository.getAccountCount() >= 1
   }

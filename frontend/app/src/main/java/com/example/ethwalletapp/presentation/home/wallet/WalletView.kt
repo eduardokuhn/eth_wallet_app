@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.ChangeCircle
-import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,18 +17,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.example.ethwalletapp.R
-import com.example.ethwalletapp.data.models.TransactionState
 import com.example.ethwalletapp.presentation.home.wallet.components.AccountBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.NetworkBottomSheetContent
 import com.example.ethwalletapp.presentation.home.wallet.components.ReceivePaymentBottomSheetContent
@@ -47,8 +39,6 @@ import com.example.ethwalletapp.shared.theme.Green5
 import com.example.ethwalletapp.shared.theme.Primary5
 import com.example.ethwalletapp.shared.utils.ViewState
 import com.example.ethwalletapp.shared.utils.weiToEther
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 sealed class WalletViewBottomSheetContent() {
@@ -225,6 +215,24 @@ fun WalletView(
                   Icons.Outlined.ArrowDropDown,
                   contentDescription = "Change network",
                   tint = Color.White
+                )
+              }
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                  .clickable { scope.launch { viewModel.refreshData() } }
+                  .align(Alignment.CenterEnd)
+              ) {
+                Icon(
+                  Icons.Outlined.Sync,
+                  contentDescription = "Synchronize data",
+                  tint = Color.White
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                  text = "Sync",
+                  fontSize = 14.sp,
+                  color = Color.White
                 )
               }
             }

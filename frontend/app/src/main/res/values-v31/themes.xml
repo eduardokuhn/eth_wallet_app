@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.EthWalletApp" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.EthWalletApp" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:statusBarColor">@color/gray24</item>
     </style>
 

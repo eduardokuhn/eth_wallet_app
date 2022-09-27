@@ -45,11 +45,13 @@ object RepositoryModule {
   @Provides
   fun provideTransactionRepositoryImpl(
     ethereumApi: IEthereumApi,
+    ethereumNetworkService: IEthereumNetworkService,
     localAppDatabase: LocalAppDatabase,
     connectivityService: IConnectivityService
   ): ITransactionRepository {
     return TransactionRepositoryImpl(
       ethereumApi = ethereumApi,
+      ethereumNetworkService = ethereumNetworkService,
       transactionDao = localAppDatabase.transactionDao(),
       connectivityService = connectivityService
     )

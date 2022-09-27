@@ -19,6 +19,9 @@ interface AccountDao {
   @Query("SELECT MAX(address_index) FROM account")
   suspend fun latestAddressIndex(): Int
 
+  @Query("DELETE FROM account")
+  suspend fun deleteAll()
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun add(account: AccountEntry)
 

@@ -16,6 +16,7 @@ import com.example.ethwalletapp.presentation.create_wallet.CreateWalletViewModel
 import com.example.ethwalletapp.presentation.home.HomeScreen
 import com.example.ethwalletapp.presentation.import_wallet.ImportWalletScreen
 import com.example.ethwalletapp.presentation.import_wallet.ImportWalletViewModel
+import com.example.ethwalletapp.presentation.receive_payment.ReceivePaymentBottomSheet
 import com.example.ethwalletapp.presentation.send_payment.SendPaymentBottomSheet
 import com.example.ethwalletapp.presentation.send_payment.SendPaymentBottomSheetViewModel
 import com.example.ethwalletapp.presentation.token_overview.TokenOverviewScreen
@@ -54,6 +55,12 @@ fun Navigator(startDestination: String) {
       ) { backStackEntry ->
         val viewModel: SendPaymentBottomSheetViewModel = hiltViewModel()
         SendPaymentBottomSheet(navController, viewModel, backStackEntry.arguments?.getString("fromAccountAddress"))
+      }
+      bottomSheet(
+        route = "${Screen.ReceivePaymentBottomSheet.route}/{selectedAccountAddress}",
+        arguments = listOf(navArgument("selectedAccountAddress") { type = NavType.StringType } )
+      ) { backStackEntry ->
+        ReceivePaymentBottomSheet(backStackEntry.arguments?.getString("selectedAccountAddress"))
       }
       composable(
         route = "${Screen.TokenOverview.route}/{selectedAccountAddress}",
