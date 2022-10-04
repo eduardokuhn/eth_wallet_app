@@ -14,5 +14,3 @@ I may have ended up implementing some patterns wrong, so don't be 100% oriented 
 <img src="/frontend/screenshots/SendTransaction.png" width="11%"></img> 
 <img src="/frontend/screenshots/SendTransactionAmountView.png" width="11%"></img> 
 <img src="/frontend/screenshots/SendTransactionConfirmView.png" width="11%"></img> 
-
-# APK Link
