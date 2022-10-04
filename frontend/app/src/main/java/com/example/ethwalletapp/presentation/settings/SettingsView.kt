@@ -57,7 +57,7 @@ fun SettingsView(
           .clickable {
             scope.launch {
               viewModel.resetWallet()
-              navController?.backQueue?.clear()
+              navController?.popBackStack(Screen.StartScreen.route, true)
               navController?.navigate(Screen.StartScreen.route)
             }
           }

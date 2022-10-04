@@ -25,10 +25,7 @@ class SettingsViewViewModel @Inject constructor(
     localAppDatabase.accountDao().deleteAll()
     localAppDatabase.balanceDao().deleteAll()
     localAppDatabase.transactionDao().deleteAll()
-    val addresses = keyStore.getAddresses()
-    addresses.forEach { address ->
-      keyStore.deleteKey(address)
-    }
+
     sharedPreferences.edit().clear().commit()
     encryptedSharedPreferences.edit().clear().commit()
   }
