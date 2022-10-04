@@ -3,8 +3,7 @@ This app is not for production use and was strictly developed as a prototype for
 I may have ended up implementing some patterns wrong, so don't be 100% oriented in the development method applied in this project, as this is the first app I developed with jetpack compose.
 
 # APK
-To use the app in your mobile device, you can download the [APK file](/app-release.apk), which is in the main repository. 
-
+To use the app in your mobile device, you can download the [APK file](/app-release.apk).
 # Screenshots
 <img src="/frontend/screenshots/HomeScreen.png" width="11%"></img> 
 <img src="/frontend/screenshots/Accounts.png" width="11%"></img> 
